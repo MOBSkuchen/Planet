@@ -87,7 +87,8 @@ class Bucket:
             self.Fopen(name)
         return self.files[name]
 
-    def alloc_file(self, name):
+    def alloc_file(self, name, overwrite=False):
+        if not overwrite and self.exists(name): return
         self.files[name] = None
 
 
