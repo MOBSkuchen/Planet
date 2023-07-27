@@ -39,8 +39,12 @@ def wrap(url):
 
 
 class Goblin:
-    def __init__(self, pytube_obj: pytube.YouTube.streams):
+    def __init__(self, pytube_obj: pytube.YouTube):
         self.yt_obj = pytube_obj
+        self.title = self.yt_obj.title
+        self.thumbnail = self.yt_obj.thumbnail_url
+        self.author = self.yt_obj.author
+        self.seconds = self.yt_obj.length
         self.url = self.yt_obj.watch_url
         self.filename = 'vid_' + self.yt_obj.video_id + ".mp3"
         self.filename = music_files_bucket.alloc_file(self.filename)  # Pretend like file exists
@@ -53,7 +57,7 @@ class Goblin:
         filename = self.filename + "_picture.jpg"
         music_files_bucket.alloc_file(filename)
         if not music_files_bucket.exists(os.path.basename(filename)):
-            urllib.request.urlretrieve(self.yt_obj.thumbnail_url, filename)
+            urllib.request.urlretrieve(self.thumbnail, filename)
         try:
             img = cv2.imread(filename)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
