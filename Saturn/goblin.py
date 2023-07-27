@@ -9,7 +9,6 @@ from Saturn import get_bucket
 from discord import FFmpegPCMAudio
 from urllib.request import urlopen
 
-
 ffmpeg_options = {
     'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
     'options': '-vn',
@@ -34,6 +33,7 @@ FFMPEG = os.environ.get("FFMPEG_EXE")
 music_files_bucket = get_bucket("storage/music")
 ytdl = yt_dlp.YoutubeDL(YTDL_OPTIONS)
 
+
 def wrap(url):
     return FFmpegPCMAudio(urlopen(url), pipe=True, executable=FFMPEG)
 
@@ -44,7 +44,10 @@ class Goblin:
         self.title = self.yt_obj.title
         self.thumbnail = self.yt_obj.thumbnail_url
         self.author = self.yt_obj.author
-        self.seconds = self.yt_obj.length
+        try:
+            self.seconds = self.yt_obj.length
+        except TypeError:
+            self.seconds = 0
         self.url = self.yt_obj.watch_url
         self.filename = 'vid_' + self.yt_obj.video_id + ".mp3"
         self.filename = music_files_bucket.alloc_file(self.filename)  # Pretend like file exists

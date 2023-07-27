@@ -10,6 +10,7 @@ os.environ["FFMPEG_EXE"] = "C:/Driver/ffmpeg/ffmpeg.exe"
 FFMPEG = os.environ.get("FFMPEG_EXE")
 
 TEST_GUILD = 830581499551809547
+ANON_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Missing_avatar.svg/2048px-Missing_avatar.svg.png"
 
 
 class Planet(discord.Bot):
@@ -46,11 +47,21 @@ async def play(ctx: ApplicationContext, query: str, first: bool):
     await ctx.defer()
     vc = await vc_check(ctx)
     if vc is None: return
-    goblin = Goblin.from_query(query)
-    ap: AudioPlayer = AudioPlayer.get(ctx.guild)
-    await ap.append_or_play(goblin)
+    goblin: Goblin = Goblin.from_query(query)
+    audio_player: AudioPlayer = AudioPlayer.get(ctx)
+    await audio_player.append_or_play(goblin)
 
-    await ctx.respond("Playing", delete_after=.0)
+    m_embed = Embed(color=goblin.get_color())
+    m_embed.add_field(name=f"Now playing: {goblin.title}",
+                      value=f"by: {goblin.author}\nPlaying for: {goblin.seconds // 60} min",
+                      inline=False)
+    m_embed.set_thumbnail(url=goblin.thumbnail)
+    url = ANON_AVATAR if not ctx.user.avatar else ctx.user.avatar.url
+    m_embed.set_footer(text=f"Requested by: {ctx.user.name}", icon_url=url)
+    while not vc.is_playing():
+        continue
+
+    await ctx.respond(embed=m_embed, view=audio_player.view)
 
 
 @client.slash_command(name="pause", )

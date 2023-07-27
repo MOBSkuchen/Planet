@@ -1,5 +1,6 @@
 from Saturn import Goblin, get_vc_from_guild
 from discord import *
+from discord.ui import *
 
 
 async def vc_check(ctx) -> VoiceClient:
@@ -18,13 +19,20 @@ async def vc_check(ctx) -> VoiceClient:
 
 
 class AudioPlayer:
-    def __init__(self, guild_: Guild):
-        self.guild = guild_
+    def __init__(self, ctx: ApplicationContext):
+        self.ctx = ctx
+        self.guild = self.ctx.guild
         self.queue: list[Goblin] = []
+        self.view: View = self.build_view()
+
+    def build_view(self):
+        from Saturn import AudioPlayerView  # Cannot import due to partially initialized module
+        return AudioPlayerView(self)
 
     @property
     def vc(self):
-        return get_vc_from_guild(client, self.guild)
+        # TODO : Change
+        return self.ctx.voice_client
 
     @vc.setter
     async def vc(self, vc: VoiceChannel):
@@ -51,6 +59,7 @@ class AudioPlayer:
 
     async def stop(self):
         self.vc.stop()
+        await self.vc.disconnect(force=True)
         del AUDIO_PLAYERS[self.guild.id]
         del self
 
@@ -70,11 +79,11 @@ class AudioPlayer:
             await self.resume()
 
     @staticmethod
-    def get(guild_: Guild):
-        _id = guild_.id
+    def get(ctx: ApplicationContext):
+        _id = ctx.guild.id
         if _id not in AUDIO_PLAYERS:
-            AUDIO_PLAYERS[_id] = AudioPlayer(guild_)
-            return AudioPlayer.get(guild_)
+            AUDIO_PLAYERS[_id] = AudioPlayer(ctx)
+            return AudioPlayer.get(ctx)
         else:
             return AUDIO_PLAYERS[_id]
 
