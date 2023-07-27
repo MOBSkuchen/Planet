@@ -11,9 +11,9 @@ class ResumeButton(Button):
     async def callback(self, interaction: Interaction):
         await self.audio_player.resume()
 
-        await self.audio_player.view.update()
+        await self.audio_player.update()
         await interaction.response.edit_message(view=self.audio_player.view)
-        await self.audio_player.view.update()
+        await self.audio_player.update()
 
 
 class PauseButton(Button):
@@ -24,9 +24,9 @@ class PauseButton(Button):
     async def callback(self, interaction: Interaction):
         await self.audio_player.pause()
 
-        await self.audio_player.view.update()
+        await self.audio_player.update()
         await interaction.response.edit_message(view=self.audio_player.view)
-        await self.audio_player.view.update()
+        await self.audio_player.update()
 
 
 class StopButton(Button):

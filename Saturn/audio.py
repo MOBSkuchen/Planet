@@ -54,8 +54,13 @@ class AudioPlayer:
         if not self.playing() and not self.paused():
             await self.play()
 
+    async def update(self):
+        # Update view
+        await self.view.update()
+
     async def pause(self):
         self.vc.pause()
+        await self.update()
 
     async def stop(self):
         self.vc.stop()
@@ -71,6 +76,7 @@ class AudioPlayer:
 
     async def resume(self):
         self.vc.resume()
+        await self.update()
 
     async def toggle(self):
         if not self.paused():
