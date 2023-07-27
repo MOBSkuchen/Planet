@@ -42,7 +42,7 @@ async def clear(ctx: ApplicationContext, amount: int):
 
 @client.slash_command(name="play")
 @option("query", description="YouTube-Video title or link", required=True)
-@option("first", description="Whether to play the Song first", type=bool, required=False)
+# @option("first", description="Whether to play the Song first", type=bool, required=False)
 async def play(ctx: ApplicationContext, query: str, first: bool):
     await ctx.defer()
     vc = await vc_check(ctx)
@@ -64,7 +64,7 @@ async def play(ctx: ApplicationContext, query: str, first: bool):
     await ctx.respond(embed=m_embed, view=audio_player.view)
 
 
-@client.slash_command(name="pause", )
+@client.slash_command(name="pause", description="Pause music playback")
 async def pause(ctx: ApplicationContext):
     await ctx.defer()
     vc = await vc_check(ctx)
@@ -76,7 +76,7 @@ async def pause(ctx: ApplicationContext):
     await ctx.respond("Paused", delete_after=.0)
 
 
-@client.slash_command(name="resume")
+@client.slash_command(name="resume", description="Resume music playback")
 async def resume(ctx: ApplicationContext):
     await ctx.defer()
     vc = await vc_check(ctx)
