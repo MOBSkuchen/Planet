@@ -5,7 +5,7 @@ import cv2
 from sklearn.cluster import KMeans
 import numpy as np
 import urllib.request
-from Saturn.storage import get_bucket
+from Saturn import get_bucket
 from discord import FFmpegPCMAudio
 from urllib.request import urlopen
 
