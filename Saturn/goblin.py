@@ -2,29 +2,58 @@ import pytube
 import yt_dlp
 import os
 import cv2
-from pytube import YouTube, Search, exceptions
 from sklearn.cluster import KMeans
 import numpy as np
 import urllib.request
 from Saturn.storage import get_bucket
+from discord import FFmpegPCMAudio
+from urllib.request import urlopen
 
 
+ffmpeg_options = {
+    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+    'options': '-vn',
+}
+YTDL_OPTIONS = {
+    'format': 'bestaudio/best',
+    'extractaudio': True,
+    'audioformat': 'mp3',
+    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+    'source_address': '0.0.0.0',
+}
+os.environ["FFMPEG_EXE"] = "C:/Driver/ffmpeg/ffmpeg.exe"
+FFMPEG = os.environ.get("FFMPEG_EXE")
 music_files_bucket = get_bucket("storage/music")
+ytdl = yt_dlp.YoutubeDL(YTDL_OPTIONS)
+
+def wrap(url):
+    return FFmpegPCMAudio(urlopen(url), pipe=True, executable=FFMPEG)
 
 
 class Goblin:
-    def __init__(self, pytube_obj: pytube.YouTube):
+    def __init__(self, pytube_obj: pytube.YouTube.streams):
         self.yt_obj = pytube_obj
-        self.url = self.yt_obj.url
-        self.filename = 'vid_' + self.yt_obj.video_id
-        music_files_bucket.alloc_file(self.filename)
-        self.color = self.get_color()
+        self.url = self.yt_obj.watch_url
+        self.filename = 'vid_' + self.yt_obj.video_id + ".mp3"
+        self.filename = music_files_bucket.alloc_file(self.filename)  # Pretend like file exists
+        try:
+            self.color = self.get_color()
+        except:
+            self.color = 0x000000
 
     def get_color(self):
         filename = self.filename + "_picture.jpg"
         music_files_bucket.alloc_file(filename)
-        if not os.path.exists(filename):
-            urllib.request.urlretrieve(self.thumbnail, filename)
+        if not music_files_bucket.exists(os.path.basename(filename)):
+            urllib.request.urlretrieve(self.yt_obj.thumbnail_url, filename)
         try:
             img = cv2.imread(filename)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -45,13 +74,42 @@ class Goblin:
     @staticmethod
     def search(query: str):
         s = pytube.Search(query)
-        return s.results, s.completion_suggestions
+        try:
+            cr = s.completion_suggestions
+        except:
+            cr = []
+        return s.results, cr
 
     @staticmethod
     def from_query(query: str, selector: int = 0):
         r, _ = Goblin.search(query)
-        return Goblin(r[0])
+        return Goblin(r[selector])
 
     @staticmethod
     def from_url(url: str):
         return Goblin(pytube.YouTube(url))
+
+    async def get(self):
+        data = ytdl.extract_info(self.url, download=False)
+        if "entries" in data:
+            # Takes the first item from a playlist
+            data = data["entries"][0]
+        url = data["url"]
+        return wrap(url)
+
+    # Fallback
+    async def download(self):
+        if os.path.exists(self.filename):
+            return wrap(self.filename)
+        video_info = yt_dlp.YoutubeDL().extract_info(
+            url=self.url, download=False
+        )
+        options = {
+            'format': 'bestaudio/best',
+            'keepvideo': False,
+            'outtmpl': self.filename,
+        }
+        with yt_dlp.YoutubeDL(options) as ydl:
+            ydl.download([video_info['webpage_url']])
+
+        return wrap(self.filename)
