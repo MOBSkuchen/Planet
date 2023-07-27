@@ -23,3 +23,8 @@ def get_member_from_user(guild_: Guild, user_: User):
     The user as a `Member` of said guild
     """
     return guild_.get_member(user_.id)
+
+
+def get_vc_from_guild(client_: Client, guild_: Guild) -> VoiceClient | None:
+    for vc in client_.voice_clients:
+        if vc.guild.id == guild_.id: return vc
