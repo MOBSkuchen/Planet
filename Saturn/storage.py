@@ -2,6 +2,7 @@ import os
 from glob import glob
 import shutil
 
+
 class Bucket:
     def __init__(self, path: str, *, std_mode='r'):
         self.path = path
@@ -10,7 +11,7 @@ class Bucket:
         self._create()
 
     def join(self, name):
-        return os.path.join(self.path, name)
+        return os.path.join(self.path, name).replace("\\", "/")
 
     def _create(self):
         if not os.path.exists(self.path):
@@ -32,7 +33,7 @@ class Bucket:
 
     def Fclose(self, name: str):
         name = self.join(name)
-        if obj:=self.files[name] is not None:
+        if obj := self.files[name] is not None:
             obj.close()
         del self.files[name]
 
@@ -88,8 +89,10 @@ class Bucket:
         return self.files[name]
 
     def alloc_file(self, name, overwrite=False):
-        if not overwrite and self.exists(name): return
+        n = self.join(name)
+        if not overwrite and self.exists(name): return n
         self.files[name] = None
+        return n
 
 
 def get_bucket(*args, **kwargs) -> Bucket:
