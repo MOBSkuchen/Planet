@@ -23,10 +23,10 @@ class Translation:
 
     __call__ = get_translation
 
-
-def make_translations(filepattern: str) -> dict:
-    r = {}
-    for file in glob(filepattern):
-        t = Translation(file)
-        r[t.lang] = t
-    return r
+    @staticmethod
+    def make_translations(filepattern: str) -> dict:
+        r = {}
+        for file in glob(filepattern):
+            t = Translation(file)
+            r[t.lang] = t
+        return r
