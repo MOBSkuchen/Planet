@@ -134,7 +134,24 @@ class Clam:
         json.dump(obj, self._handle)
 
 
-def get_bucket(*args, **kwargs) -> Bucket:
-    bucket = Bucket(*args, **kwargs)
+class Group:
+    def __init__(self, path: str):
+        self.path = path
+
+    def join(self, *names):
+        return os.path.join(self.path, *names)
+
+    def _create(self):
+        if not os.path.exists(self.path):
+            os.mkdir(self.path)
+
+    def get_bucket(self, name: str, *, std_mode='r') -> Bucket:
+        bucket = Bucket(self.join(name), std_mode=std_mode)
+        bucket.files_make()
+        return bucket
+
+
+def get_bucket(name: str, *, std_mode='r') -> Bucket:
+    bucket = Bucket(name, std_mode=std_mode)
     bucket.files_make()
     return bucket
