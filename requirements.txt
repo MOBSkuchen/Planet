@@ -4,3 +4,4 @@ numpy
 sklearn
 opencv-python
 pytube
+yt_dlp
