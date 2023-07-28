@@ -1,6 +1,7 @@
 import os
 from glob import glob
 import shutil
+import json
 
 
 class Bucket:
@@ -10,8 +11,8 @@ class Bucket:
         self.std_mode = std_mode
         self._create()
 
-    def join(self, name):
-        return os.path.join(self.path, name).replace("\\", "/")
+    def join(self, *names):
+        return os.path.join(self.path, *names).replace("\\", "/")
 
     def _create(self):
         if not os.path.exists(self.path):
@@ -93,6 +94,44 @@ class Bucket:
         if not overwrite and self.exists(name): return n
         self.files[name] = None
         return n
+
+    def is_clam(self, name: str):
+        return type(self.files[name]) == Clam
+
+    def clam(self, name: str):
+        clam = Clam(name, self)
+        self.files[name] = clam
+        return clam
+
+
+class Clam:
+    def __init__(self, name: str, bucket: Bucket):
+        self.name = name
+        self.bucket = bucket
+        self.path = self.bucket.join(self.name)
+        self._handle = open(self.path, 'r+')
+        if not os.path.exists(self.path):
+            self.dumps(self.path)
+
+    def exports(self, key: str, value: str):
+        obj = self.loads()
+        obj[key] = value
+        self.dumps(obj)
+
+    def imports(self, key: str):
+        return self.loads().get(key)
+
+    def deletes(self, key: str):
+        obj = self.loads()
+        if key in obj:
+            del obj[key]
+        self.dumps(obj)
+
+    def loads(self):
+        return json.load(self._handle)
+
+    def dumps(self, obj: dict):
+        json.dump(obj, self._handle)
 
 
 def get_bucket(*args, **kwargs) -> Bucket:
