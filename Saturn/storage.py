@@ -2,6 +2,37 @@ import os
 from glob import glob
 import shutil
 import json
+from discord import *
+
+
+class Clam:
+    def __init__(self, name: str, bucket):
+        self.name = name
+        self.bucket = bucket
+        self.path = self.bucket.join(self.name)
+        self._handle = open(self.path, 'r+')
+        if not os.path.exists(self.path):
+            self.dumps(self.path)
+
+    def exports(self, key: str, value: str):
+        obj = self.loads()
+        obj[key] = value
+        self.dumps(obj)
+
+    def imports(self, key: str):
+        return self.loads().get(key)
+
+    def deletes(self, key: str):
+        obj = self.loads()
+        if key in obj:
+            del obj[key]
+        self.dumps(obj)
+
+    def loads(self):
+        return json.load(self._handle)
+
+    def dumps(self, obj: dict):
+        json.dump(obj, self._handle)
 
 
 class Bucket:
@@ -103,40 +134,25 @@ class Bucket:
         self.files[name] = clam
         return clam
 
+    def add_clam(self, clam: Clam):
+        self.files[clam.name] = clam
 
-class Clam:
-    def __init__(self, name: str, bucket: Bucket):
-        self.name = name
-        self.bucket = bucket
-        self.path = self.bucket.join(self.name)
-        self._handle = open(self.path, 'r+')
-        if not os.path.exists(self.path):
-            self.dumps(self.path)
+    def get_item(self, name: str):
+        return self.files[name]
 
-    def exports(self, key: str, value: str):
-        obj = self.loads()
-        obj[key] = value
-        self.dumps(obj)
-
-    def imports(self, key: str):
-        return self.loads().get(key)
-
-    def deletes(self, key: str):
-        obj = self.loads()
-        if key in obj:
-            del obj[key]
-        self.dumps(obj)
-
-    def loads(self):
-        return json.load(self._handle)
-
-    def dumps(self, obj: dict):
-        json.dump(obj, self._handle)
+    def from_member(self, member_: Member):
+        name = f'mem_{member_.id}'
+        if not self.exists(name):
+            return self.get_item(name)
+        c = Clam(name, self)
+        self.add_clam(c)
+        return c
 
 
 class Group:
     def __init__(self, path: str):
         self.path = path
+        self.buckets = {}
 
     def join(self, *names):
         return os.path.join(self.path, *names)
@@ -148,6 +164,7 @@ class Group:
     def get_bucket(self, name: str, *, std_mode='r') -> Bucket:
         bucket = Bucket(self.join(name), std_mode=std_mode)
         bucket.files_make()
+        self.buckets[name] = bucket
         return bucket
 
 
@@ -155,3 +172,9 @@ def get_bucket(name: str, *, std_mode='r') -> Bucket:
     bucket = Bucket(name, std_mode=std_mode)
     bucket.files_make()
     return bucket
+
+
+class Servers(Group):
+    def add(self, guild_: Guild):
+        name = f's_{guild_.id}'
+        return self.get_bucket(name)
