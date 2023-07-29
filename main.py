@@ -1,8 +1,9 @@
 from discord import *
 import discord
+from discord.ext import bridge
 import warnings
 import os
-from Saturn import retrieve_token, Goblin, AudioPlayer, vc_check
+from Saturn import retrieve_token, Goblin, AudioPlayer, vc_check, Servers
 
 warnings.filterwarnings("ignore")
 
@@ -11,16 +12,17 @@ FFMPEG = os.environ.get("FFMPEG_EXE")
 
 TEST_GUILD = 830581499551809547
 ANON_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Missing_avatar.svg/2048px-Missing_avatar.svg.png"
+SERVERS = Servers("storage/servers")
 
 
-class Planet(discord.Bot):
+class Planet(bridge.Bot):
     async def on_ready(self):
         print(f"PlanetBot V4 started ({self.user})")
 
     async def on_message(self, g_message: Message):
-        user: User = g_message.author
+        user_: User = g_message.author
         # Ignore own messages
-        if user.id == self.user.id:
+        if user_.id == self.user.id:
             return
 
 
@@ -28,8 +30,15 @@ intents: discord.flags.Intents = Intents.all()
 client = Planet(intents=intents, debug_guilds=[TEST_GUILD])
 
 
+@client.event
+async def on_member_join(member_: Member):
+    b = SERVERS.add(member_.guild)
+    c = b.from_member(member_)
+    return c
+
+
 @client.slash_command(name="clear", description="Clears <amount> messages from current channel")
-@option("amount", description="Number of messages", min_value=1, max_value=99, required=True)
+@option("amount", description="Number of messages", min_value=1, max_value=100, required=True)
 @default_permissions(
     manage_messages=True
 )
