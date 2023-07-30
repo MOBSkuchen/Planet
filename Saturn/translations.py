@@ -1,4 +1,16 @@
 from glob import glob
+LANG_EMOJI_MAP = {
+    "English": "🇬🇧",
+    "German": "🇩🇪",
+    "Spanish": "🇪🇸",
+    "French": "🇫🇷",
+    "Japanese": "🇯🇵",
+    "Chinese": "🇨🇳",
+    "Arabic": "🇦🇪",
+    "Russian": "🇷🇺",
+    "Italian": "🇮🇹",
+    "Portuguese": "🇵🇹"
+}
 
 
 class Translation:
