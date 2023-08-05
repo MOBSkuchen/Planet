@@ -3,7 +3,7 @@ import discord
 from discord.ext import bridge
 import warnings
 import os
-from Saturn import retrieve_token, Goblin, AudioPlayer, vc_check, Servers
+from Saturn import retrieve_token, Goblin, AudioPlayer, vc_check, Servers, SettingView, servers
 
 warnings.filterwarnings("ignore")
 
@@ -12,7 +12,6 @@ FFMPEG = os.environ.get("FFMPEG_EXE")
 
 TEST_GUILD = 830581499551809547
 ANON_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Missing_avatar.svg/2048px-Missing_avatar.svg.png"
-SERVERS = Servers("storage/servers")
 
 
 class Planet(bridge.Bot):
@@ -32,7 +31,7 @@ client = Planet(intents=intents, debug_guilds=[TEST_GUILD])
 
 @client.event
 async def on_member_join(member_: Member):
-    b = SERVERS.add(member_.guild)
+    b = servers.add_and_init(member_.guild)
     c = b.from_member(member_)
     return c
 
@@ -96,5 +95,10 @@ async def resume(ctx: ApplicationContext):
 
     await ctx.respond("Resumed", delete_after=.0)
 
+
+@client.slash_command(name="manage", description="Manage Planet's server settings")
+async def manage(ctx: ApplicationContext):
+    servers.add_and_init(ctx.guild)
+    await ctx.respond("", view=SettingView(ctx))
 
 client.run(retrieve_token())
