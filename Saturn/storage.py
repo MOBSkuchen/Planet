@@ -154,6 +154,8 @@ class Group:
         self.path = path
         self.buckets = {}
 
+        self._create()
+
     def join(self, *names):
         return os.path.join(self.path, *names)
 
@@ -161,9 +163,12 @@ class Group:
         if not os.path.exists(self.path):
             os.mkdir(self.path)
 
+    def _init_bucket(self, bucket: Bucket): pass
+
     def get_bucket(self, name: str, *, std_mode='r') -> Bucket:
         bucket = Bucket(self.join(name), std_mode=std_mode)
         bucket.files_make()
+        self._init_bucket(bucket)
         self.buckets[name] = bucket
         return bucket
 
@@ -175,6 +180,41 @@ def get_bucket(name: str, *, std_mode='r') -> Bucket:
 
 
 class Servers(Group):
-    def add(self, guild_: Guild):
-        name = f's_{guild_.id}'
-        return self.get_bucket(name)
+    @staticmethod
+    def get_guild_name(guild_: Guild | int):
+        if type(guild_) == Guild:
+            guild_ = guild_.id
+        return f"g_{guild_}"
+
+    def get_guild_bucket(self, guild_: Guild | int, **kwargs):
+        return self.get_bucket(self.get_guild_name(guild_), **kwargs)
+
+    def _init_bucket(self, bucket: Bucket):
+        bucket.clam("settings")
+        bucket.clam("users")
+
+    def init_server(self, guild_: Guild | int):
+        self.set_server_setting(guild_, "reports", 0)
+        self.set_server_setting(guild_, "lang", "English")
+
+    def add(self, guild_: Guild | int):
+        return self.get_bucket(self.get_guild_name(guild_))
+
+    def set_server_setting(self, guild_: Guild | int, key: str, value: str | int | bool):
+        bucket = self.get_guild_bucket(guild_)
+        c = bucket.clam("settings")
+        c.exports(key, value)
+
+    def get_server_setting(self, guild_: Guild | int, key: str):
+        bucket = self.get_guild_bucket(guild_)
+        c = bucket.clam("settings")
+        return c.imports(key)
+
+    def add_and_init(self, guild_: Guild | int):
+        x = self.add(guild_)
+        self.init_server(guild_)
+        return x
+
+
+servers = Servers("storage/servers")
+
