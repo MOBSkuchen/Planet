@@ -5,14 +5,21 @@ import json
 from discord import *
 
 
+def _create_file(filename):
+    with open(filename, 'w') as file_:
+        file_.write("{}")
+
+
 class Clam:
     def __init__(self, name: str, bucket):
         self.name = name
         self.bucket = bucket
         self.path = self.bucket.join(self.name)
-        self._handle = open(self.path, 'r+')
         if not os.path.exists(self.path):
-            self.dumps(self.path)
+            _create_file(self.path)
+
+    def _handle(self, mode):
+        return open(self.path, mode)
 
     def exports(self, key: str, value: str):
         obj = self.loads()
@@ -29,13 +36,12 @@ class Clam:
         self.dumps(obj)
 
     def loads(self):
-        return json.loads(self._handle.read())
+        with self._handle("r") as h:
+            return json.loads(h.read())
 
     def dumps(self, obj: dict):
-        self._handle.write(json.dumps(obj))
-
-    def close(self):
-        self._handle.close()
+        with self._handle("w") as h:
+            h.write(json.dumps(obj))
 
 
 class Bucket:
