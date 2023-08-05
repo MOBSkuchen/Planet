@@ -29,10 +29,13 @@ class Clam:
         self.dumps(obj)
 
     def loads(self):
-        return json.load(self._handle)
+        return json.loads(self._handle.read())
 
     def dumps(self, obj: dict):
-        json.dump(obj, self._handle)
+        self._handle.write(json.dumps(obj))
+
+    def close(self):
+        self._handle.close()
 
 
 class Bucket:
