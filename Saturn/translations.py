@@ -1,3 +1,5 @@
+from Saturn.storage import servers
+from discord import Guild
 from glob import glob
 LANG_EMOJI_MAP = {
     "English": "🇬🇧",
@@ -11,6 +13,9 @@ LANG_EMOJI_MAP = {
     "Italian": "🇮🇹",
     "Portuguese": "🇵🇹"
 }
+
+
+translations = {}
 
 
 class Translation:
@@ -28,17 +33,20 @@ class Translation:
                 self.contents[id_] = content
 
     def get_translation(self, id_, **kwargs) -> str:
-        c = self.contents[id_]
+        c = self.contents[id_.lower()]
         for t, rw in kwargs.items():
             c = c.replace("$" + t, rw)
         return c
 
-    __call__ = get_translation
-
     @staticmethod
     def make_translations(filepattern: str) -> dict:
-        r = {}
+        global translations
         for file in glob(filepattern):
             t = Translation(file)
-            r[t.lang] = t
-        return r
+            translations[t.lang.lower()] = t
+        return translations
+
+
+def get_server_translation(guild: Guild | int, id_, **kwargs):
+    lang = servers.get_server_setting(guild, "lang")
+    return translations[lang.lower()].get_translation(id_, **kwargs)
