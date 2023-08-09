@@ -2,7 +2,6 @@ from discord import *
 import discord
 from discord.ext import bridge
 import warnings
-import os
 from Saturn import retrieve_token, retrieve_debug_guilds, Goblin, AudioPlayer, vc_check, SettingView, servers, Translation, get_server_translation
 
 warnings.filterwarnings("ignore")
