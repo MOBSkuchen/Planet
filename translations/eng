@@ -1,0 +1,6 @@
+english
+now_playing;Now playing:
+by;by:
+playing_for;Playing for:
+requested_by;Requested by:
+msg_clear;You purged $amount messages from #$channel
