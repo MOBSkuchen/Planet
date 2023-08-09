@@ -3,7 +3,7 @@ import discord
 from discord.ext import bridge
 import warnings
 import os
-from Saturn import retrieve_token, Goblin, AudioPlayer, vc_check, Servers, SettingView, servers
+from Saturn import retrieve_token, Goblin, AudioPlayer, vc_check, Servers, SettingView, servers, Translation, get_server_translation
 
 warnings.filterwarnings("ignore")
 
@@ -12,6 +12,8 @@ FFMPEG = os.environ.get("FFMPEG_EXE")
 
 TEST_GUILD = 830581499551809547
 ANON_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Missing_avatar.svg/2048px-Missing_avatar.svg.png"
+
+translation = Translation.make_translations("translations/*")
 
 
 class Planet(bridge.Bot):
@@ -44,7 +46,7 @@ async def on_member_join(member_: Member):
 async def clear(ctx: ApplicationContext, amount: int):
     await ctx.channel.purge(limit=amount)
     await ctx.respond(
-        "You purged {amount} messages from {channel}".format(amount=amount, channel=ctx.channel.name),
+        get_server_translation(ctx.guild, "msg_clear", amount=amount, channel=ctx.channel.name),
         delete_after=10.0)
 
 
@@ -60,12 +62,12 @@ async def play(ctx: ApplicationContext, query: str, first: bool):
     await audio_player.append_or_play(goblin)
 
     m_embed = Embed(color=goblin.get_color())
-    m_embed.add_field(name=f"Now playing: {goblin.title}",
-                      value=f"by: {goblin.author}\nPlaying for: {goblin.seconds // 60} min",
+    m_embed.add_field(name=f"{get_server_translation(ctx.guild, 'now_playing')}{goblin.title}",
+                      value=f"{get_server_translation(ctx.guild, 'by')}{goblin.author}\n{get_server_translation(ctx.guild, 'playing_for')}{goblin.seconds // 60} min",
                       inline=False)
     m_embed.set_thumbnail(url=goblin.thumbnail)
     url = ANON_AVATAR if not ctx.user.avatar else ctx.user.avatar.url
-    m_embed.set_footer(text=f"Requested by: {ctx.user.name}", icon_url=url)
+    m_embed.set_footer(text=f"{get_server_translation(ctx.guild, 'requested_by')}{ctx.user.name}", icon_url=url)
     while not vc.is_playing():
         continue
 

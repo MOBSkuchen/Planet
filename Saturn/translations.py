@@ -27,15 +27,17 @@ class Translation:
 
     def load(self) -> None:
         with open(self.filepath, 'r') as file:
-            self.lang = file.readline(1)
-            for i in file.readlines():
-                id_, content = i.split(";")
+            for i, c in enumerate(file.readlines()):
+                if i == 0:
+                    self.lang = c.lower()[:-1]
+                    continue
+                id_, content = c.split(";")
                 self.contents[id_] = content
 
     def get_translation(self, id_, **kwargs) -> str:
         c = self.contents[id_.lower()]
         for t, rw in kwargs.items():
-            c = c.replace("$" + t, rw)
+            c = c.replace("$" + t, str(rw))
         return c
 
     @staticmethod
