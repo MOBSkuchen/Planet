@@ -3,14 +3,11 @@ import discord
 from discord.ext import bridge
 import warnings
 import os
-from Saturn import retrieve_token, Goblin, AudioPlayer, vc_check, Servers, SettingView, servers, Translation, get_server_translation
+from Saturn import retrieve_token, retrieve_debug_guilds, Goblin, AudioPlayer, vc_check, SettingView, servers, Translation, get_server_translation
 
 warnings.filterwarnings("ignore")
 
-os.environ["FFMPEG_EXE"] = "C:/Driver/ffmpeg/ffmpeg.exe"
-FFMPEG = os.environ.get("FFMPEG_EXE")
-
-TEST_GUILD = 830581499551809547
+TEST_GUILDS = retrieve_debug_guilds()
 ANON_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Missing_avatar.svg/2048px-Missing_avatar.svg.png"
 
 translation = Translation.make_translations("translations/*")
@@ -28,7 +25,7 @@ class Planet(bridge.Bot):
 
 
 intents: discord.flags.Intents = Intents.all()
-client = Planet(intents=intents, debug_guilds=[TEST_GUILD])
+client = Planet(intents=intents, debug_guilds=TEST_GUILDS)
 
 
 @client.event

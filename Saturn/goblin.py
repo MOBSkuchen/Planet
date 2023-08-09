@@ -28,8 +28,7 @@ YTDL_OPTIONS = {
     'default_search': 'auto',
     'source_address': '0.0.0.0',
 }
-os.environ["FFMPEG_EXE"] = "C:/Driver/ffmpeg/ffmpeg.exe"
-FFMPEG = os.environ.get("FFMPEG_EXE")
+FFMPEG = os.environ.get("FFMPEG")
 music_files_bucket = get_bucket("storage/music")
 ytdl = yt_dlp.YoutubeDL(YTDL_OPTIONS)
 
