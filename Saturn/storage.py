@@ -51,7 +51,12 @@ class Bucket:
         self.std_mode = std_mode
         self._create()
 
+    def __del__(self):
+        self.Fclose_all()
+
     def join(self, *names):
+        if names[0].replace("\\", "/").startswith(self.path.replace("\\", "/")):
+            return os.path.join(*names).replace("\\", "/")
         return os.path.join(self.path, *names).replace("\\", "/")
 
     def _create(self):
@@ -74,12 +79,13 @@ class Bucket:
 
     def Fclose(self, name: str):
         name = self.join(name)
-        if obj := self.files[name] is not None:
+        if name not in self.files: return
+        if (obj := self.files[name]) is not None:
             obj.close()
         del self.files[name]
 
     def Fclose_all(self):
-        for name in self.files.keys(): self.Fclose(name)
+        for name in list(self.files.keys()): self.Fclose(name)
 
     def Fdel(self, name):
         name = self.join(name)
@@ -188,12 +194,19 @@ def get_bucket(name: str, *, std_mode='r') -> Bucket:
     return bucket
 
 
+def bucket_exists(name: str) -> bool:
+    return os.path.exists(servers.join(name))
+
+
+guid = lambda guild_: guild_.id if isinstance(guild_, Guild) else guild_
+
+
 class Servers(Group):
     @staticmethod
-    def get_guild_name(guild_: Guild | int):
-        if type(guild_) == Guild:
-            guild_ = guild_.id
-        return f"g_{guild_}"
+    def get_guild_name(guild_: Guild | int): return f"g_{guid(guild_)}"
+
+    @staticmethod
+    def guild_exists(guild_: Guild | int): return bucket_exists(Servers.get_guild_name(guild_))
 
     def get_guild_bucket(self, guild_: Guild | int, **kwargs):
         return self.get_bucket(self.get_guild_name(guild_), **kwargs)
@@ -220,8 +233,10 @@ class Servers(Group):
         return c.imports(key)
 
     def add_and_init(self, guild_: Guild | int):
+        exists = self.guild_exists(guild_)
         x = self.add(guild_)
-        self.init_server(guild_)
+        if not exists:
+            self.init_server(guild_)
         return x
 
 
