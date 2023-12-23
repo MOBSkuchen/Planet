@@ -48,11 +48,14 @@ async def clear(ctx: ApplicationContext, amount: int):
 
 @client.slash_command(name="play")
 @option("query", description="YouTube-Video title or link", required=True)
-# @option("first", description="Whether to play the Song first", type=bool, required=False)
-async def play(ctx: ApplicationContext, query: str, first: bool):
+async def play(ctx: ApplicationContext, query: str):
     await ctx.defer()
     vc = await vc_check(ctx)
-    if vc is None: return
+
+    if vc is None:
+        await ctx.respond("Joining the VC failed")
+        return
+
     goblin: Goblin = Goblin.from_query(query)
     audio_player: AudioPlayer = AudioPlayer.get(ctx)
     await audio_player.append_or_play(goblin)
@@ -64,9 +67,6 @@ async def play(ctx: ApplicationContext, query: str, first: bool):
     m_embed.set_thumbnail(url=goblin.thumbnail)
     url = ANON_AVATAR if not ctx.user.avatar else ctx.user.avatar.url
     m_embed.set_footer(text=f"{get_server_translation(ctx.guild, 'requested_by')}{ctx.user.name}", icon_url=url)
-    while not vc.is_playing():
-        continue
-
     await ctx.respond(embed=m_embed, view=audio_player.view)
 
 
@@ -76,7 +76,7 @@ async def pause(ctx: ApplicationContext):
     vc = await vc_check(ctx)
     if vc is None: return
 
-    ap: AudioPlayer = AudioPlayer.get(ctx.guild)
+    ap: AudioPlayer = AudioPlayer.get(ctx)
     await ap.pause()
 
     await ctx.respond("Paused", delete_after=.0)
@@ -88,7 +88,7 @@ async def resume(ctx: ApplicationContext):
     vc = await vc_check(ctx)
     if vc is None: return
 
-    ap: AudioPlayer = AudioPlayer.get(ctx.guild)
+    ap: AudioPlayer = AudioPlayer.get(ctx)
     await ap.resume()
 
     await ctx.respond("Resumed", delete_after=.0)
