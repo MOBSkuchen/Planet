@@ -28,7 +28,7 @@ YTDL_OPTIONS = {
     'default_search': 'auto',
     'source_address': '0.0.0.0',
 }
-FFMPEG = os.environ.get("FFMPEG")
+FFMPEG = "C:/Driver/ffmpeg/ffmpeg.exe"
 music_files_bucket = get_bucket("storage/music")
 ytdl = yt_dlp.YoutubeDL(YTDL_OPTIONS)
 
@@ -45,7 +45,7 @@ class Goblin:
         self.author = self.yt_obj.author
         try:
             self.seconds = self.yt_obj.length
-        except TypeError:
+        except TypeError as te:
             self.seconds = 0
         self.url = self.yt_obj.watch_url
         self.filename = 'vid_' + self.yt_obj.video_id + ".mp3"
