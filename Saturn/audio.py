@@ -1,11 +1,16 @@
-from Saturn import Goblin, get_vc_from_guild
+import time
+
+from Saturn import Goblin
+import asyncio
 from discord import *
 from discord.ui import *
 
 
 async def vc_check(ctx) -> VoiceClient:
+    # After working on this for months, I have found out that it had to do with me using py-cord==2.4.0 and not py-cord==2.4.1
+    # Fuck me man
     vc = ctx.voice_client
-    mem: Member = ctx.guild.get_member(ctx.user.id)
+    mem: Member = ctx.user
 
     if not vc:
         if not mem.voice:
@@ -13,9 +18,9 @@ async def vc_check(ctx) -> VoiceClient:
                               delete_after=10.0)
             return None
         else:
-            vc = await mem.voice.channel.connect()
+            await mem.voice.channel.connect()
 
-    return vc
+    return ctx.voice_client
 
 
 class AudioPlayer:
