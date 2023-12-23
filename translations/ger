@@ -3,4 +3,5 @@ now_playing;Jetzt spielt:
 by;von:
 playing_for;Spielt für:
 requested_by;Angefordert von:
-msg_clear;Du hast $amount aus #$channel geloescht
+msg_clear;Du hast $amount Nachrichten aus #$channel geloescht
+current;Aktuell
