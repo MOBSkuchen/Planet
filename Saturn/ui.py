@@ -1,6 +1,6 @@
 from discord import *
 from discord.ui import *
-from Saturn import AudioPlayer, LANG_EMOJI_MAP, servers
+from Saturn import AudioPlayer, LANG_EMOJI_MAP, servers, get_server_translation
 
 
 class ResumeButton(Button):
@@ -60,14 +60,18 @@ class AudioPlayerView(View):
 
         self.resume_button = ResumeButton(self.audio_player, "Resume")
         self.pause_button = PauseButton(self.audio_player, "Pause")
+        self.stop_button = StopButton(self.audio_player, "Stop")
 
         self.add_item(self.resume_button)
         self.add_item(self.pause_button)
+        self.add_item(self.stop_button)
 
 
-def _lang_opt(name: str):
+def _lang_opt(name: str, guid):
     if name != "Back":
         emoji_ = LANG_EMOJI_MAP[name]
+        if servers.get_server_setting(guid, "lang") == name:
+            name += f" ({get_server_translation(guid, 'current')})"
     else:
         emoji_ = "🔙"
     return SelectOption(label=name, emoji=emoji_)
@@ -79,16 +83,18 @@ class LanguagesSettingView(View):
         super().__init__()
 
         class LanguagesSelection(Select):
-            def __init__(self_):
+            def __init__(self_, guid):
                 self_._options = [
-                    _lang_opt("English"),
-                    _lang_opt("German"),
-                    _lang_opt("Back")
+                    _lang_opt("English", guid),
+                    _lang_opt("German", guid),
+                    _lang_opt("Back", guid)
                 ]
                 super().__init__(ComponentType.string_select, placeholder="Select one language", custom_id="lang", options=self_._options)
 
             async def callback(self_, interaction: Interaction):
                 lx = self_.values[0]
+                if " " in lx:
+                    lx = lx.split(" ")[0]
                 self.remove_item(self.get_item("lang"))
                 if lx == "Back":
                     return
@@ -97,7 +103,7 @@ class LanguagesSettingView(View):
 
                 await self.root.ctx.delete()
 
-        self.add_item(LanguagesSelection())
+        self.add_item(LanguagesSelection(root.ctx.guild_id))
 
 
 class SettingView(View):
