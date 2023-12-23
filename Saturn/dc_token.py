@@ -16,4 +16,4 @@ def retrieve_token(filename="token", path=None):
 
 
 def retrieve_debug_guilds(filename="debug_guilds", path=None):
-    return retrieve(filename, path).splitlines()
+    return list(map(int, retrieve(filename, path).splitlines()))
