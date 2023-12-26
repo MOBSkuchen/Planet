@@ -1,9 +1,10 @@
-import time
-
-from Saturn import Goblin
-import asyncio
+################
+## DEPRECATED ##
+################
 from discord import *
 from discord.ui import *
+
+Goblin = None
 
 
 async def vc_check(ctx) -> VoiceClient:
@@ -24,7 +25,7 @@ async def vc_check(ctx) -> VoiceClient:
 
 
 class AudioPlayer:
-    def __init__(self, ctx: ApplicationContext):
+    def __init__(self, ctx):
         self.ctx = ctx
         self.guild = self.ctx.guild
         self.queue: list[Goblin] = []
@@ -90,7 +91,7 @@ class AudioPlayer:
             await self.resume()
 
     @staticmethod
-    def get(ctx: ApplicationContext):
+    def get(ctx):
         _id = ctx.guild.id
         if _id not in AUDIO_PLAYERS:
             AUDIO_PLAYERS[_id] = AudioPlayer(ctx)
