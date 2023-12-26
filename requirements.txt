@@ -1,7 +1,7 @@
 py-cord
 # For Goblin
 numpy
-sklearn
+scikit-learn
 opencv-python
 pytube
 yt_dlp
