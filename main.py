@@ -1,4 +1,4 @@
-from discord import User, Message, Member, Intents, ApplicationContext, option, default_permissions, Embed
+from discord import User, Message, Member, Intents, ApplicationContext, option, default_permissions, Embed, SlashCommand
 from discord.ext import bridge
 from typing import cast
 import warnings
@@ -51,6 +51,12 @@ class Planet(bridge.Bot):
         embed = get_embed(player, payload)
         await player.home.send(embed=embed)
 
+    @staticmethod
+    def get_player(ctx: ApplicationContext) -> wavelink.Player:
+        player: wavelink.Player
+        player = cast(wavelink.Player, ctx.voice_client)
+        return player
+
 
 intents: discord.flags.Intents = Intents.all()
 client = Planet(intents=intents, debug_guilds=TEST_GUILDS)
@@ -78,6 +84,23 @@ async def clear(ctx: ApplicationContext, amount: int):
 async def manage(ctx: ApplicationContext):
     servers.add_and_init(ctx.guild)
     await ctx.respond("", view=SettingView(ctx))
+
+
+@client.slash_command(name="pause", description="Pauses / Resumes the playback")
+async def pause(ctx: ApplicationContext):
+    player = client.get_player(ctx)
+    await player.pause(not player.paused)
+    await ctx.respond("Done", delete_after=0.1)
+
+
+@client.slash_command(name="skip", description="Play next track in Queue")
+@option("amount", description="The amount of songs to skip", required=False)
+async def skip(ctx: ApplicationContext, amount:int=1):
+    player = client.get_player(ctx)
+    for i in range(amount):
+        await player.skip()
+
+    await ctx.respond(f"Skipped {amount} song(s)", delete_after=5.0)
 
 
 @client.slash_command(name="play")
@@ -126,4 +149,5 @@ async def play(ctx: ApplicationContext, query: str):
         await player.play(player.queue.get(), volume=DEFAULT_VOLUME)
 
 
-client.run(retrieve_token())
+def launch():
+    client.run(retrieve_token())
