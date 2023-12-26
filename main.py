@@ -1,26 +1,55 @@
-from discord import *
-import discord
+from discord import User, Message, Member, Intents, ApplicationContext, option, default_permissions, Embed
 from discord.ext import bridge
+from typing import cast
 import warnings
-from Saturn import retrieve_token, retrieve_debug_guilds, Goblin, AudioPlayer, vc_check, SettingView, servers, Translation, get_server_translation
+import yaml
+import discord
+import wavelink
+from Saturn import retrieve_token, retrieve_debug_guilds, SettingView, servers, Translation, get_server_translation, get_embed, mention
+
+def auto_load_yml(filename="application.yml"):
+    with open(filename, 'r') as stream:
+        loaded = yaml.safe_load(stream)
+    uri = f'http://{loaded["server"]["address"]}:{loaded["server"]["port"]}'
+    password = loaded["lavalink"]["server"]["password"]
+    return {"uri": uri, "password": password}
 
 warnings.filterwarnings("ignore")
 
 TEST_GUILDS = retrieve_debug_guilds()
 ANON_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Missing_avatar.svg/2048px-Missing_avatar.svg.png"
-
 translation = Translation.make_translations("translations/*")
+DEFAULT_VOLUME = 100
+
+__version__ = "4.1"
 
 
 class Planet(bridge.Bot):
     async def on_ready(self):
-        print(f"PlanetBot V4 started ({self.user})")
+        await self.setup_hook()
+        msg = f"PlanetBot V{__version__} started ({self.user}) " + "[PLAYER READY AND OK]" if wavelink.Player else "[PROBLEM WITH PLAYER, EXCEPTION INCOMING]"
+        print(msg)
+        if not wavelink.Player:
+            raise Exception("Player not OK")
+        print("=" * len(msg))
 
     async def on_message(self, g_message: Message):
         user_: User = g_message.author
         # Ignore own messages
         if user_.id == self.user.id:
             return
+
+    async def setup_hook(self) -> None:
+        nodes = [wavelink.Node(**auto_load_yml())]
+        await wavelink.Pool.connect(nodes=nodes, client=self, cache_capacity=100)
+
+    async def on_wavelink_track_start(self, payload: wavelink.TrackStartEventPayload) -> None:
+        player: wavelink.Player | None = payload.player
+        if not player:
+            # Handle edge cases...
+            return
+        embed = get_embed(player, payload)
+        await player.home.send(embed=embed)
 
 
 intents: discord.flags.Intents = Intents.all()
@@ -45,58 +74,56 @@ async def clear(ctx: ApplicationContext, amount: int):
         get_server_translation(ctx.guild, "msg_clear", amount=amount, channel=ctx.channel.name),
         delete_after=10.0)
 
-
-@client.slash_command(name="play")
-@option("query", description="YouTube-Video title or link", required=True)
-async def play(ctx: ApplicationContext, query: str):
-    await ctx.defer()
-    vc = await vc_check(ctx)
-
-    if vc is None:
-        await ctx.respond("Joining the VC failed")
-        return
-
-    goblin: Goblin = Goblin.from_query(query)
-    audio_player: AudioPlayer = AudioPlayer.get(ctx)
-    await audio_player.append_or_play(goblin)
-
-    m_embed = Embed(color=goblin.get_color())
-    m_embed.add_field(name=f"{get_server_translation(ctx.guild, 'now_playing')}{goblin.title}",
-                      value=f"{get_server_translation(ctx.guild, 'by')}{goblin.author}\n{get_server_translation(ctx.guild, 'playing_for')}{goblin.seconds // 60} min",
-                      inline=False)
-    m_embed.set_thumbnail(url=goblin.thumbnail)
-    url = ANON_AVATAR if not ctx.user.avatar else ctx.user.avatar.url
-    m_embed.set_footer(text=f"{get_server_translation(ctx.guild, 'requested_by')}{ctx.user.name}", icon_url=url)
-    await ctx.respond(embed=m_embed, view=audio_player.view)
-
-
-@client.slash_command(name="pause", description="Pause music playback")
-async def pause(ctx: ApplicationContext):
-    await ctx.defer()
-    vc = await vc_check(ctx)
-    if vc is None: return
-
-    ap: AudioPlayer = AudioPlayer.get(ctx)
-    await ap.pause()
-
-    await ctx.respond("Paused", delete_after=.0)
-
-
-@client.slash_command(name="resume", description="Resume music playback")
-async def resume(ctx: ApplicationContext):
-    await ctx.defer()
-    vc = await vc_check(ctx)
-    if vc is None: return
-
-    ap: AudioPlayer = AudioPlayer.get(ctx)
-    await ap.resume()
-
-    await ctx.respond("Resumed", delete_after=.0)
-
-
 @client.slash_command(name="manage", description="Manage Planet's server settings")
 async def manage(ctx: ApplicationContext):
     servers.add_and_init(ctx.guild)
     await ctx.respond("", view=SettingView(ctx))
+
+
+@client.slash_command(name="play")
+@option("query", description="Play a song!", required=True)
+async def play(ctx: ApplicationContext, query: str):
+    if not ctx.guild:
+        return
+
+    player: wavelink.Player
+    player = cast(wavelink.Player, ctx.voice_client)
+    if not player:
+        try:
+            player = await ctx.author.voice.channel.connect(cls=wavelink.Player)  # type: ignore
+        except AttributeError:
+            await ctx.send("Please join a voice channel first before using this command.")
+            return
+        except discord.ClientException:
+            await ctx.send("I was unable to join this voice channel. Please try again.")
+            return
+
+    player.autoplay = wavelink.AutoPlayMode.enabled
+
+    if not hasattr(player, "home"):
+        player.home = ctx.channel
+    elif player.home != ctx.channel:
+        await ctx.send(f"You can only play songs in {player.home.mention}, as the player has already started there.")
+        return
+
+    tracks: wavelink.Search = await wavelink.Playable.search(query)
+    if not tracks:
+        await ctx.send(f"{mention(ctx.author)} - Could not find any tracks with that query. Please try again.")
+        return
+
+    for track in tracks:
+        track.extras = {"requested_by": ctx.user.id, "guild": ctx.guild_id}
+
+    if isinstance(tracks, wavelink.Playlist):
+        added: int = await player.queue.put_wait(tracks)
+        await ctx.send(f"Added the playlist **`{tracks.name}`** ({added} songs) to the queue.")
+    else:
+        track: wavelink.Playable = tracks[0]
+        await player.queue.put_wait(track)
+        await ctx.send(f"Added **`{track}`** to the queue.")
+
+    if not player.playing:
+        await player.play(player.queue.get(), volume=DEFAULT_VOLUME)
+
 
 client.run(retrieve_token())
