@@ -48,16 +48,14 @@ def get_color(thumbnail):
     return dc_color
 
 
-def get_embed(player: wavelink.Player, payload: wavelink.TrackStartEventPayload):
-    original: wavelink.Playable | None = payload.original
-    track: wavelink.Playable = payload.track
+def get_embed(player: wavelink.Player, track: wavelink.Playable):
 
     thumbnail = track.artwork
     title = track.title
     guild = player.guild
     author = track.author
     milliseconds = track.length
-    if recommended := original and original.recommended:
+    if recommended := track.recommended:
         requester = track.source
         requester[0].upper()
         requester_name = requester
