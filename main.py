@@ -115,10 +115,10 @@ async def play(ctx: ApplicationContext, query: str):
         try:
             player = await ctx.author.voice.channel.connect(cls=wavelink.Player)  # type: ignore
         except AttributeError:
-            await ctx.send("Please join a voice channel first before using this command.")
+            await ctx.respond("Please join a voice channel first before using this command.")
             return
         except discord.ClientException:
-            await ctx.send("I was unable to join this voice channel. Please try again.")
+            await ctx.respond("I was unable to join this voice channel. Please try again.")
             return
 
     player.autoplay = wavelink.AutoPlayMode.enabled
@@ -126,7 +126,7 @@ async def play(ctx: ApplicationContext, query: str):
     if not hasattr(player, "home"):
         player.home = ctx.channel
     elif player.home != ctx.channel:
-        await ctx.send(f"You can only play songs in {player.home.mention}, as the player has already started there.")
+        await ctx.respond(f"You can only play songs in {player.home.mention}, as the player has already started there.")
         return
 
     tracks: wavelink.Search = await wavelink.Playable.search(query)
@@ -139,11 +139,11 @@ async def play(ctx: ApplicationContext, query: str):
 
     if isinstance(tracks, wavelink.Playlist):
         added: int = await player.queue.put_wait(tracks)
-        await ctx.send(f"Added the playlist **`{tracks.name}`** ({added} songs) to the queue.")
+        await ctx.respond(f"Added the playlist **`{tracks.name}`** ({added} songs) to the queue.")
     else:
         track: wavelink.Playable = tracks[0]
         await player.queue.put_wait(track)
-        await ctx.send(f"Added **`{track}`** to the queue.")
+        await ctx.respond(f"Added **`{track}`** to the queue.")
 
     if not player.playing:
         await player.play(player.queue.get(), volume=DEFAULT_VOLUME)
