@@ -1,10 +1,12 @@
-from discord import User, Message, Member, Intents, ApplicationContext, option, default_permissions, Embed, SlashCommand
+from discord import User, Message, Member, Intents, ApplicationContext, option, default_permissions
 from discord.ext import bridge
 from typing import cast
 import warnings
 import yaml
 import discord
 import wavelink
+from wavelink import Node
+
 from Saturn import retrieve_token, retrieve_debug_guilds, SettingView, servers, Translation, get_server_translation, get_embed, mention
 
 def auto_load_yml(filename="application.yml"):
@@ -22,6 +24,9 @@ translation = Translation.make_translations("translations/*")
 DEFAULT_VOLUME = 100
 
 __version__ = "4.1"
+
+
+wavelink.Player.associated_message = None
 
 
 class Planet(bridge.Bot):
@@ -48,8 +53,11 @@ class Planet(bridge.Bot):
         if not player:
             # Handle edge cases...
             return
-        embed = get_embed(player, payload)
-        await player.home.send(embed=embed)
+        embed = get_embed(player, payload.track)
+        player.associated_message = await player.home.send(embed=embed)
+
+    async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload) -> None:
+        await payload.player.associated_message.delete()
 
     @staticmethod
     def get_player(ctx: ApplicationContext) -> wavelink.Player:
@@ -103,12 +111,22 @@ async def skip(ctx: ApplicationContext, amount:int=1):
     await ctx.respond(f"Skipped {amount} song(s)", delete_after=5.0)
 
 
+@client.slash_command(name="volume", description="Set playback volume")
+@option("percent", description="The audio volume percentage", min_value=0, max_value=150, required=True)
+async def volume(ctx: ApplicationContext, percent: int):
+    player = client.get_player(ctx)
+    await player.set_volume(percent)
+
+    await ctx.respond(f"Set volume to {str(percent)}")
+
+
 @client.slash_command(name="play")
 @option("query", description="Play a song!", required=True)
 async def play(ctx: ApplicationContext, query: str):
     if not ctx.guild:
         return
 
+    track = None
     player: wavelink.Player
     player = cast(wavelink.Player, ctx.voice_client)
     if not player:
@@ -136,6 +154,7 @@ async def play(ctx: ApplicationContext, query: str):
 
     for track in tracks:
         track.extras = {"requested_by": ctx.user.id, "guild": ctx.guild_id}
+
 
     if isinstance(tracks, wavelink.Playlist):
         added: int = await player.queue.put_wait(tracks)
