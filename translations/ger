@@ -15,3 +15,4 @@ join_vc;Bitte trete zuerst einem VoiceChannel bei
 unable2join;Ich konnte diesem VoiceChannel nicht beitreten (du kannst es noch mal versuchen, aber das bringt wahrscheinlich nichts)
 skipped_songs;$amount song(s) übersprungen
 done;Fertig
+only_playback;Diese Aktion ist nur während der Wiedergabe erlaubt

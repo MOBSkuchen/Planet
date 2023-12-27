@@ -15,3 +15,4 @@ join_vc;Please join a voice channel first
 unable2join;I was unable to join this voice channel (you can try again but it probably won't help)
 skipped_songs;Skipped $amount song(s)
 done;Done
+only_playback;This action is only allowed during playback
