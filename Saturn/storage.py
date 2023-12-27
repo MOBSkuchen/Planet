@@ -10,6 +10,11 @@ def _create_file(filename):
         file_.write("{}")
 
 
+def _check_storage(path="storage"):
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+
 class Clam:
     def __init__(self, name: str, bucket):
         self.name = name
@@ -240,5 +245,5 @@ class Servers(Group):
         return x
 
 
+_check_storage()
 servers = Servers("storage/servers")
-
