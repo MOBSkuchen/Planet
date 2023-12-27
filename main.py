@@ -99,7 +99,7 @@ async def manage(ctx: ApplicationContext):
 async def pause(ctx: ApplicationContext):
     player = client.get_player(ctx)
     await player.pause(not player.paused)
-    await ctx.respond("Done", delete_after=0.1)
+    await ctx.respond(get_server_translation(ctx.guild, "done"), delete_after=0.1)
 
 
 @client.slash_command(name="skip", description="Play next track in Queue")
@@ -109,7 +109,7 @@ async def skip(ctx: ApplicationContext, amount: int = 1):
     for i in range(amount):
         await player.skip()
 
-    await ctx.respond(f"Skipped {amount} song(s)", delete_after=5.0)
+    await ctx.respond(get_server_translation(ctx.guild, "skipped_song", amount=amount), delete_after=5.0)
 
 
 @client.slash_command(name="volume", description="Set playback volume")
@@ -118,7 +118,7 @@ async def volume(ctx: ApplicationContext, percent: int):
     player = client.get_player(ctx)
     await player.set_volume(percent)
 
-    await ctx.respond(f"Set volume to {str(percent)}")
+    await ctx.respond(get_server_translation(ctx.guild, "volume_set", volume=percent))
 
 
 @client.slash_command(name="play")
@@ -134,10 +134,10 @@ async def play(ctx: ApplicationContext, query: str):
         try:
             player = await ctx.author.voice.channel.connect(cls=wavelink.Player)  # type: ignore
         except AttributeError:
-            await ctx.respond("Please join a voice channel first before using this command.")
+            await ctx.respond(get_server_translation(ctx.guild, "join_vc"))
             return
         except discord.ClientException:
-            await ctx.respond("I was unable to join this voice channel. Please try again.")
+            await ctx.respond(get_server_translation(ctx.guild, "unable2join"))
             return
 
     player.autoplay = wavelink.AutoPlayMode.enabled
@@ -145,12 +145,12 @@ async def play(ctx: ApplicationContext, query: str):
     if not hasattr(player, "home"):
         player.home = ctx.channel
     elif player.home != ctx.channel:
-        await ctx.respond(f"You can only play songs in {player.home.mention}, as the player has already started there.")
+        await ctx.respond(get_server_translation(ctx.guild, "play_outside_home", channel=player.home.mention))
         return
 
     tracks: wavelink.Search = await wavelink.Playable.search(query)
     if not tracks:
-        await ctx.send(f"{mention(ctx.author)} - Could not find any tracks with that query. Please try again.")
+        await ctx.send(get_server_translation(ctx.guild, "track_not_found", user=mention(ctx.author)))
         return
 
     for track in tracks:
@@ -158,11 +158,11 @@ async def play(ctx: ApplicationContext, query: str):
 
     if isinstance(tracks, wavelink.Playlist):
         added: int = await player.queue.put_wait(tracks)
-        await ctx.respond(f"Added the playlist **`{tracks.name}`** ({added} songs) to the queue.")
+        await ctx.respond(get_server_translation(ctx.guild, "added_playlist", pl_name=tracks.name, pl_count=added))
     else:
         track: wavelink.Playable = tracks[0]
         await player.queue.put_wait(track)
-        await ctx.respond(f"Added **`{track}`** to the queue.")
+        await ctx.respond(get_server_translation(ctx.guild, "added_track", track=track.title))
 
     if not player.playing:
         await player.play(player.queue.get(), volume=DEFAULT_VOLUME)
