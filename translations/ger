@@ -1,12 +1,12 @@
 german
 now_playing;Jetzt spielt:
 by;von:
-playing_for;Spielt für:
+playing_for;Spielt fuer:
 requested_by;Angefordert von:
 msg_clear;Du hast **$amount** Nachrichten aus #$channel geloescht
 current;Aktuell
-volume_set;Lautstaerke auf $volume% gesetzt
-added_track;$track zur Warteschlange hinzugefuegt
+volume_set;Lautstaerke auf **$volume%** gesetzt
+added_track;**$track** zur Warteschlange hinzugefuegt
 added_playlist;Playlist $pl_name ($pl_count songs) zur Warteschlange hinzugefuegt
 pause_resume;Wiedergabe pausiert oder fortgesetzt
 track_not_found;$user - Keine songs mit dieser Suchanfrage gefunden
