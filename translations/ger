@@ -3,7 +3,7 @@ now_playing;Jetzt spielt:
 by;von:
 playing_for;Spielt für:
 requested_by;Angefordert von:
-msg_clear;Du hast $amount Nachrichten aus #$channel geloescht
+msg_clear;Du hast **$amount** Nachrichten aus #$channel geloescht
 current;Aktuell
 volume_set;Lautstaerke auf $volume% gesetzt
 added_track;$track zur Warteschlange hinzugefuegt
@@ -13,6 +13,6 @@ track_not_found;$user - Keine songs mit dieser Suchanfrage gefunden
 play_outside_home;I kann nur in $channel spielen, weil die Wiedergabe dort gestartet wurde
 join_vc;Bitte trete zuerst einem VoiceChannel bei
 unable2join;Ich konnte diesem VoiceChannel nicht beitreten (du kannst es noch mal versuchen, aber das bringt wahrscheinlich nichts)
-skipped_songs;$amount song(s) übersprungen
+skipped_songs;**$amount** song(s) übersprungen
 done;Fertig
 only_playback;Diese Aktion ist nur während der Wiedergabe erlaubt
