@@ -3,3 +3,4 @@ py-cord
 numpy
 scikit-learn
 opencv-python
+wavelink
