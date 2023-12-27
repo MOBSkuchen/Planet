@@ -23,6 +23,7 @@ TEST_GUILDS = retrieve_debug_guilds()
 ANON_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Missing_avatar.svg/2048px-Missing_avatar.svg.png"
 translation = Translation.make_translations("translations/*")
 DEFAULT_VOLUME = 100
+MAX_VOLUME = 500
 
 __version__ = "4.1"
 
@@ -120,7 +121,7 @@ async def skip(ctx: ApplicationContext, amount: int = 1):
 
 
 @client.slash_command(name="volume", description="Set playback volume")
-@option("percent", description="The audio volume percentage", min_value=0, max_value=150, required=True)
+@option("percent", description="The audio volume percentage", min_value=0, max_value=MAX_VOLUME, required=True)
 async def volume(ctx: ApplicationContext, percent: int):
     player = client.get_player(ctx)
     if player is None:
