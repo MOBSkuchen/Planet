@@ -5,9 +5,9 @@ import warnings
 import yaml
 import discord
 import wavelink
-from wavelink import Node
+from Saturn import retrieve_token, retrieve_debug_guilds, SettingView, servers, Translation, get_server_translation, \
+    get_embed, mention
 
-from Saturn import retrieve_token, retrieve_debug_guilds, SettingView, servers, Translation, get_server_translation, get_embed, mention
 
 def auto_load_yml(filename="application.yml"):
     with open(filename, 'r') as stream:
@@ -15,6 +15,7 @@ def auto_load_yml(filename="application.yml"):
     uri = f'http://{loaded["server"]["address"]}:{loaded["server"]["port"]}'
     password = loaded["lavalink"]["server"]["password"]
     return {"uri": uri, "password": password}
+
 
 warnings.filterwarnings("ignore")
 
@@ -24,7 +25,6 @@ translation = Translation.make_translations("translations/*")
 DEFAULT_VOLUME = 100
 
 __version__ = "4.1"
-
 
 wavelink.Player.associated_message = None
 
@@ -53,7 +53,7 @@ class Planet(bridge.Bot):
         if not player:
             # Handle edge cases...
             return
-        embed = get_embed(player, payload.track)
+        embed = get_embed(player, payload.track, payload.original and payload.original.recommended)
         player.associated_message = await player.home.send(embed=embed)
 
     async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload) -> None:
@@ -88,6 +88,7 @@ async def clear(ctx: ApplicationContext, amount: int):
         get_server_translation(ctx.guild, "msg_clear", amount=amount, channel=ctx.channel.name),
         delete_after=10.0)
 
+
 @client.slash_command(name="manage", description="Manage Planet's server settings")
 async def manage(ctx: ApplicationContext):
     servers.add_and_init(ctx.guild)
@@ -103,7 +104,7 @@ async def pause(ctx: ApplicationContext):
 
 @client.slash_command(name="skip", description="Play next track in Queue")
 @option("amount", description="The amount of songs to skip", required=False)
-async def skip(ctx: ApplicationContext, amount:int=1):
+async def skip(ctx: ApplicationContext, amount: int = 1):
     player = client.get_player(ctx)
     for i in range(amount):
         await player.skip()
@@ -155,7 +156,6 @@ async def play(ctx: ApplicationContext, query: str):
     for track in tracks:
         track.extras = {"requested_by": ctx.user.id, "guild": ctx.guild_id}
 
-
     if isinstance(tracks, wavelink.Playlist):
         added: int = await player.queue.put_wait(tracks)
         await ctx.respond(f"Added the playlist **`{tracks.name}`** ({added} songs) to the queue.")
@@ -170,3 +170,7 @@ async def play(ctx: ApplicationContext, query: str):
 
 def launch():
     client.run(retrieve_token())
+
+
+if __name__ == '__main__':
+    launch()
