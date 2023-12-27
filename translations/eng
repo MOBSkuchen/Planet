@@ -5,3 +5,13 @@ playing_for;Playing for:
 requested_by;Requested by:
 msg_clear;You purged $amount messages from #$channel
 current;Current
+volume_set;Set volume to $volume%
+added_track;Added $track to the queue
+added_playlist;Added the playlist $pl_name ($pl_count songs) to the queue
+pause_resume;Paused / Resumed playback
+track_not_found;$user - Could not find any tracks for that query
+play_outside_home;Can only play in $channel, as the player has already been started there
+join_vc;Please join a voice channel first
+unable2join;I was unable to join this voice channel (you can try again but it probably won't help)
+skipped_songs;Skipped $amount song(s)
+done;Done
