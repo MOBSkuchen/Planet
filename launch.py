@@ -1,5 +1,3 @@
-import sys
-
 from main import launch
 import multiprocessing as mp
 import subprocess as sbp
