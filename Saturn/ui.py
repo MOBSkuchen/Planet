@@ -1,53 +1,55 @@
-from discord import *
-from discord.ui import *
+import wavelink
+from discord import Interaction, ButtonStyle, SelectOption, ComponentType, ApplicationContext
+from discord.ui import Button, View, Select
 from Saturn import AudioPlayer, LANG_EMOJI_MAP, servers, get_server_translation
 
 
 class ResumeButton(Button):
-    def __init__(self, audio_player: AudioPlayer, label: str):
-        self.audio_player = audio_player
-        super().__init__(style=ButtonStyle.primary if self.audio_player.paused() else ButtonStyle.secondary, label=label, disabled=not self.audio_player.paused())
+    def __init__(self, original_view: View, player: wavelink.Player, label: str):
+        self.player = player
+        self.original_view = original_view
+        super().__init__(style=ButtonStyle.primary if self.player.paused else ButtonStyle.secondary, label=label, disabled=not self.player.paused)
 
     async def callback(self, interaction: Interaction):
-        await self.audio_player.resume()
+        await self.player.pause(False)
 
-        await self.audio_player.update()
-        await interaction.response.edit_message(view=self.audio_player.view)
-        await self.audio_player.update()
+        await self.original_view.update()
+        await interaction.response.edit_message(view=self.original_view)
+        await self.original_view.update()
 
 
 class PauseButton(Button):
-    def __init__(self, audio_player: AudioPlayer, label: str):
-        self.audio_player = audio_player
-        super().__init__(style=ButtonStyle.primary if not self.audio_player.paused() else ButtonStyle.secondary, label=label, disabled=self.audio_player.paused())
+    def __init__(self, original_view: View, player: wavelink.Player, label: str):
+        self.player = player
+        self.original_view = original_view
+        super().__init__(style=ButtonStyle.primary if not self.player.paused else ButtonStyle.secondary, label=label, disabled=self.player.paused)
 
     async def callback(self, interaction: Interaction):
-        await self.audio_player.pause()
+        await self.player.pause(True)
 
-        await self.audio_player.update()
-        await interaction.response.edit_message(view=self.audio_player.view)
-        await self.audio_player.update()
+        await self.original_view.update()
+        await interaction.response.edit_message(view=self.original_view)
+        await self.original_view.update()
 
 
 class StopButton(Button):
-    def __init__(self, audio_player: AudioPlayer, label: str):
-        self.audio_player = audio_player
-        super().__init__(style=ButtonStyle.primary if not self.audio_player.paused() else ButtonStyle.secondary,
-                         label=label, disabled=self.audio_player.paused())
+    def __init__(self, player: wavelink.Player, label: str):
+        self.player = player
+        super().__init__(style=ButtonStyle.danger, label=label)
 
     async def callback(self, interaction: Interaction):
         await interaction.message.delete(reason="Playback stop")
-        await self.audio_player.stop()
+        await self.player.disconnect()
 
 
 class AudioPlayerView(View):
-    def __init__(self, audio_player: AudioPlayer):
+    def __init__(self, player: wavelink.Player):
         super().__init__()
-        self.audio_player = audio_player
+        self.player = player
 
-        self.resume_button = ResumeButton(self.audio_player, "Resume")
-        self.pause_button = PauseButton(self.audio_player, "Pause")
-        self.stop_button = StopButton(self.audio_player, "Stop")
+        self.resume_button = ResumeButton(self, self.player, "Resume")
+        self.pause_button = PauseButton(self, self.player, "Pause")
+        self.stop_button = StopButton(self.player, "Stop")
 
         self.add_item(self.resume_button)
         self.add_item(self.pause_button)
@@ -58,9 +60,9 @@ class AudioPlayerView(View):
         self.remove_item(self.pause_button)
         self.remove_item(self.stop_button)
 
-        self.resume_button = ResumeButton(self.audio_player, "Resume")
-        self.pause_button = PauseButton(self.audio_player, "Pause")
-        self.stop_button = StopButton(self.audio_player, "Stop")
+        self.resume_button = ResumeButton(self, self.player, "Resume")
+        self.pause_button = PauseButton(self, self.player, "Pause")
+        self.stop_button = StopButton(self.player, "Stop")
 
         self.add_item(self.resume_button)
         self.add_item(self.pause_button)
