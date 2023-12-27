@@ -224,22 +224,19 @@ class Servers(Group):
         self.set_server_setting(guild_, "reports", 0)
         self.set_server_setting(guild_, "lang", "English")
 
-    def add(self, guild_: Guild | int):
-        return self.get_bucket(self.get_guild_name(guild_))
-
     def set_server_setting(self, guild_: Guild | int, key: str, value: str | int | bool):
-        bucket = self.get_guild_bucket(guild_)
+        bucket = self.init_and_get(guild_)
         c = bucket.clam("settings")
         c.exports(key, value)
 
     def get_server_setting(self, guild_: Guild | int, key: str):
-        bucket = self.get_guild_bucket(guild_)
+        bucket = self.init_and_get(guild_)
         c = bucket.clam("settings")
         return c.imports(key)
 
-    def add_and_init(self, guild_: Guild | int):
+    def init_and_get(self, guild_: Guild | int):
         exists = self.guild_exists(guild_)
-        x = self.add(guild_)
+        x = self.get_guild_bucket(guild_)
         if not exists:
             self.init_server(guild_)
         return x
