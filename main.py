@@ -6,7 +6,7 @@ import yaml
 import discord
 import wavelink
 from Saturn import retrieve_token, retrieve_debug_guilds, SettingView, servers, Translation, get_server_translation, \
-    get_embed, mention
+    get_embed, mention, AudioPlayerView
 
 
 def auto_load_yml(filename="application.yml"):
@@ -54,10 +54,11 @@ class Planet(bridge.Bot):
             # Handle edge cases...
             return
         embed = get_embed(player, payload.track, payload.original and payload.original.recommended)
-        player.associated_message = await player.home.send(embed=embed)
+        player.associated_message = await player.home.send(embed=embed, view=AudioPlayerView(player))
 
     async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload) -> None:
-        await payload.player.associated_message.delete()
+        if payload.player is None:
+            await payload.player.associated_message.delete()
 
     @staticmethod
     def get_player(ctx: ApplicationContext) -> wavelink.Player:
@@ -91,13 +92,16 @@ async def clear(ctx: ApplicationContext, amount: int):
 
 @client.slash_command(name="manage", description="Manage Planet's server settings")
 async def manage(ctx: ApplicationContext):
-    servers.add_and_init(ctx.guild)
+    servers.init_and_get(ctx.guild)
     await ctx.respond("", view=SettingView(ctx))
 
 
 @client.slash_command(name="pause", description="Pauses / Resumes the playback")
 async def pause(ctx: ApplicationContext):
     player = client.get_player(ctx)
+    if player is None:
+        await ctx.respond(get_server_translation(ctx.guild, "only_playback"))
+        return
     await player.pause(not player.paused)
     await ctx.respond(get_server_translation(ctx.guild, "done"), delete_after=0.1)
 
@@ -106,6 +110,9 @@ async def pause(ctx: ApplicationContext):
 @option("amount", description="The amount of songs to skip", required=False)
 async def skip(ctx: ApplicationContext, amount: int = 1):
     player = client.get_player(ctx)
+    if player is None:
+        await ctx.respond(get_server_translation(ctx.guild, "only_playback"))
+        return
     for i in range(amount):
         await player.skip()
 
@@ -116,6 +123,9 @@ async def skip(ctx: ApplicationContext, amount: int = 1):
 @option("percent", description="The audio volume percentage", min_value=0, max_value=150, required=True)
 async def volume(ctx: ApplicationContext, percent: int):
     player = client.get_player(ctx)
+    if player is None:
+        await ctx.respond(get_server_translation(ctx.guild, "only_playback"))
+        return
     await player.set_volume(percent)
 
     await ctx.respond(get_server_translation(ctx.guild, "volume_set", volume=percent))
@@ -126,7 +136,6 @@ async def volume(ctx: ApplicationContext, percent: int):
 async def play(ctx: ApplicationContext, query: str):
     if not ctx.guild:
         return
-
     track = None
     player: wavelink.Player
     player = cast(wavelink.Player, ctx.voice_client)
