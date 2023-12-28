@@ -38,6 +38,17 @@ class PlayButton(ButtonTemplate):
         await self.player.pause(not self.player.paused)
 
 
+class AutoPlayButton(ButtonTemplate):
+    def mod_button(self):
+        if self.player.autoplay:
+            self.label = "Disable Autoplay"
+            self.style = ButtonStyle.secondary
+        else:
+            self.label = "Enable Autoplay"
+            self.style = ButtonStyle.primary
+        self.player.autoplay = not self.player.autoplay
+
+
 class StopButton(ButtonTemplate):
     def __init__(self, player: wavelink.Player, label: str):
         self.player = player
