@@ -6,7 +6,7 @@ import yaml
 import discord
 import wavelink
 from Saturn import retrieve_token, retrieve_debug_guilds, SettingView, servers, Translation, get_server_translation, \
-    get_embed, mention, AudioPlayerView
+    get_embed, mention, AudioPlayerView, FiltersView
 
 
 def auto_load_yml(filename="application.yml"):
@@ -176,6 +176,16 @@ async def play(ctx: ApplicationContext, query: str):
 
     if not player.playing:
         await player.play(player.queue.get(), volume=DEFAULT_VOLUME)
+
+
+@client.slash_command(name="filter")
+async def filter(ctx: ApplicationContext):
+    player = client.get_player(ctx)
+    if player is None:
+        await ctx.respond(get_server_translation(ctx.guild, "only_playback"))
+        return
+
+    await ctx.respond("", view=FiltersView(player))
 
 
 def launch():

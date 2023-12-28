@@ -180,7 +180,7 @@ class CloseButton(Button):
         await (await interaction.original_response()).delete()
 
 
-class Filters(ViewTemplate):
+class FiltersView(ViewTemplate):
     def __init__(self, player: wavelink.Player):
         self.player = player
         super().__init__()

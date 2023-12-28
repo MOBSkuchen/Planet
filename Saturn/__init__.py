@@ -4,4 +4,4 @@ from Saturn.storage import get_bucket, Bucket, Group, Clam, Servers, servers
 from Saturn.utils import mention, get_vc_from_guild, get_member_from_user, get_user, time_format, random_id
 from Saturn.goblin import get_embed
 from Saturn.audio import AudioPlayer, AUDIO_PLAYERS, vc_check  # DEPRECATED
-from Saturn.ui import ResumeButton, PauseButton, StopButton, AudioPlayerView, SettingView
+from Saturn.ui import ResumeButton, PauseButton, StopButton, AudioPlayerView, SettingView, FiltersView
