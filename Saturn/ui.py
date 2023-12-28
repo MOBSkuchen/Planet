@@ -1,14 +1,23 @@
 import wavelink
 from discord import Interaction, ButtonStyle, SelectOption, ComponentType, ApplicationContext
 from discord.ui import Button, View, Select
-from Saturn import AudioPlayer, LANG_EMOJI_MAP, servers, get_server_translation
+from Saturn import LANG_EMOJI_MAP, servers, get_server_translation
+
+
+class ViewTemplate(View):
+    async def rem_all(self): pass
+
+    async def add_all(self): pass
+
+    async def update(self): pass
 
 
 class ResumeButton(Button):
-    def __init__(self, original_view: View, player: wavelink.Player, label: str):
+    def __init__(self, original_view: ViewTemplate, player: wavelink.Player, label: str):
         self.player = player
         self.original_view = original_view
-        super().__init__(style=ButtonStyle.primary if self.player.paused else ButtonStyle.secondary, label=label, disabled=not self.player.paused)
+        super().__init__(style=ButtonStyle.primary if self.player.paused else ButtonStyle.secondary, label=label,
+                         disabled=not self.player.paused)
 
     async def callback(self, interaction: Interaction):
         await self.player.pause(False)
@@ -19,10 +28,11 @@ class ResumeButton(Button):
 
 
 class PauseButton(Button):
-    def __init__(self, original_view: View, player: wavelink.Player, label: str):
+    def __init__(self, original_view: ViewTemplate, player: wavelink.Player, label: str):
         self.player = player
         self.original_view = original_view
-        super().__init__(style=ButtonStyle.primary if not self.player.paused else ButtonStyle.secondary, label=label, disabled=self.player.paused)
+        super().__init__(style=ButtonStyle.primary if not self.player.paused else ButtonStyle.secondary, label=label,
+                         disabled=self.player.paused)
 
     async def callback(self, interaction: Interaction):
         await self.player.pause(True)
@@ -42,7 +52,7 @@ class StopButton(Button):
         await self.player.disconnect()
 
 
-class AudioPlayerView(View):
+class AudioPlayerView(ViewTemplate):
     def __init__(self, player: wavelink.Player):
         super().__init__()
         self.player = player
@@ -78,7 +88,7 @@ def _lang_opt(name: str, guid):
     return SelectOption(label=name, emoji=emoji_)
 
 
-class LanguagesSettingView(View):
+class LanguagesSettingView(ViewTemplate):
     def __init__(self, root):
         self.root = root
         super().__init__()
@@ -90,7 +100,8 @@ class LanguagesSettingView(View):
                     _lang_opt("German", guid),
                     _lang_opt("Back", guid)
                 ]
-                super().__init__(ComponentType.string_select, placeholder="Select one language", custom_id="lang", options=self_._options)
+                super().__init__(ComponentType.string_select, placeholder="Select one language", custom_id="lang",
+                                 options=self_._options)
 
             async def callback(self_, interaction: Interaction):
                 lx = self_.values[0]
@@ -134,3 +145,49 @@ class SettingView(View):
 
         self.sms_S = ServerManagementSelection()
         super().__init__(self.sms_S)
+
+
+class FilterTemplate(Button):
+    def __init__(self, player: wavelink.Player, attr: str, filter_name: str, *, prim: bool = True, **kwargs):
+        self.player = player
+        self.kwargs = kwargs
+        self.attr = attr
+        super().__init__(style=ButtonStyle.primary if prim else ButtonStyle.secondary, label=filter_name)
+
+    async def callback(self, interaction: Interaction):
+        filters: wavelink.Filters = self.player.filters
+        filters.__getattribute__(self.attr).timescale.set(**self.kwargs)
+        await self.player.set_filters(filters)
+
+
+class ResetFilter(Button):
+    def __init__(self, player: wavelink.Player):
+        self.player = player
+        super().__init__(style=ButtonStyle.danger, label="Reset")
+
+    async def callback(self, interaction: Interaction):
+        filters: wavelink.Filters = self.player.filters
+        filters.reset()
+        await self.player.set_filters(filters)
+
+
+class CloseButton(Button):
+    def __init__(self, player: wavelink.Player):
+        self.player = player
+        super().__init__(style=ButtonStyle.danger, label="Close")
+
+    async def callback(self, interaction: Interaction):
+        await (await interaction.original_response()).delete()
+
+
+class Filters(ViewTemplate):
+    def __init__(self, player: wavelink.Player):
+        self.player = player
+        super().__init__()
+
+    async def add_all(self):
+        self.nightcore = FilterTemplate(self.player, "timescale", "Nightcore", pitch=1.2, speed=1.2, rate=1)
+        self.add_item(self.nightcore)
+
+    async def rem_all(self):
+        self.remove_item(self.nightcore)
