@@ -101,7 +101,8 @@ class LanguagesSettingView(View):
                 if lx == "Back":
                     return
                 servers.set_server_setting(interaction.guild, "lang", lx)
-                await interaction.response.send_message(f"Set servers language to **{lx}**")
+                await interaction.response.send_message(
+                    get_server_translation(interaction.guild, "set_servers_lang", lang=lx), delete_after=5.0)
 
                 await self.root.ctx.delete()
 
@@ -121,13 +122,16 @@ class SettingView(View):
                 self_._opts2funcs = {
                     "Language": LanguagesSettingView
                 }
-                super().__init__(ComponentType.string_select, placeholder="Select one option", custom_id="sms", options=self_._options)
+                super().__init__(ComponentType.string_select,
+                                 placeholder="Select one option", custom_id="sms", options=self_._options)
 
             async def callback(self_, interaction: Interaction):
                 v = self_.values[0]
                 f = self_._opts2funcs[v]
 
                 await interaction.response.send_message(view=f(self))
+                og_msg = await interaction.original_response()
+                await og_msg.delete()
 
         self.sms_S = ServerManagementSelection()
         super().__init__(self.sms_S)
