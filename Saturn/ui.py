@@ -47,19 +47,18 @@ class AudioPlayerView(View):
         super().__init__()
         self.player = player
 
-        self.resume_button = ResumeButton(self, self.player, "Resume")
-        self.pause_button = PauseButton(self, self.player, "Pause")
-        self.stop_button = StopButton(self.player, "Stop")
-
-        self.add_item(self.resume_button)
-        self.add_item(self.pause_button)
-        self.add_item(self.stop_button)
+        self.add_all()
 
     async def update(self):
+        await self.rem_all()
+        await self.add_all()
+
+    async def rem_all(self):
         self.remove_item(self.resume_button)
         self.remove_item(self.pause_button)
         self.remove_item(self.stop_button)
 
+    async def add_all(self):
         self.resume_button = ResumeButton(self, self.player, "Resume")
         self.pause_button = PauseButton(self, self.player, "Pause")
         self.stop_button = StopButton(self.player, "Stop")
