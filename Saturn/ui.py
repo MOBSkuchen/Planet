@@ -12,30 +12,23 @@ class ViewTemplate(View):
     async def update(self): pass
 
 
-class ResumeButton(Button):
-    def __init__(self, original_view: ViewTemplate, player: wavelink.Player, label: str):
+class PlayButton(Button):
+    def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
         self.player = player
         self.original_view = original_view
-        super().__init__(style=ButtonStyle.primary if self.player.paused else ButtonStyle.secondary, label=label,
-                         disabled=not self.player.paused)
+        super().__init__()
+
+    def mod_button(self):
+        if self.player.paused:  # Paused
+            self.label = "Play"
+            self.style = ButtonStyle.primary
+        else:
+            self.label = "Pause"
+            self.style = ButtonStyle.secondary
 
     async def callback(self, interaction: Interaction):
-        await self.player.pause(False)
-
-        await self.original_view.update()
-        await interaction.response.edit_message(view=self.original_view)
-        await self.original_view.update()
-
-
-class PauseButton(Button):
-    def __init__(self, original_view: ViewTemplate, player: wavelink.Player, label: str):
-        self.player = player
-        self.original_view = original_view
-        super().__init__(style=ButtonStyle.primary if not self.player.paused else ButtonStyle.secondary, label=label,
-                         disabled=self.player.paused)
-
-    async def callback(self, interaction: Interaction):
-        await self.player.pause(True)
+        await self.player.pause(not self.player.paused)
+        self.mod_button()
 
         await self.original_view.update()
         await interaction.response.edit_message(view=self.original_view)
@@ -65,16 +58,13 @@ class AudioPlayerView(ViewTemplate):
 
     async def rem_all(self):
         self.remove_item(self.resume_button)
-        self.remove_item(self.pause_button)
         self.remove_item(self.stop_button)
 
     async def add_all(self):
-        self.resume_button = ResumeButton(self, self.player, "Resume")
-        self.pause_button = PauseButton(self, self.player, "Pause")
+        self.resume_button = PlayButton(self, self.player)
         self.stop_button = StopButton(self.player, "Stop")
 
         self.add_item(self.resume_button)
-        self.add_item(self.pause_button)
         self.add_item(self.stop_button)
 
 
