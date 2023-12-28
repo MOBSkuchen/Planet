@@ -58,7 +58,7 @@ class Planet(bridge.Bot):
         player.associated_message = await player.home.send(embed=embed, view=AudioPlayerView(player))
 
     async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload) -> None:
-        if payload.player is None:
+        if payload.player is not None:
             await payload.player.associated_message.delete()
 
     @staticmethod
@@ -144,10 +144,10 @@ async def play(ctx: ApplicationContext, query: str):
         try:
             player = await ctx.author.voice.channel.connect(cls=wavelink.Player)  # type: ignore
         except AttributeError:
-            await ctx.respond(get_server_translation(ctx.guild, "join_vc"))
+            await ctx.respond(get_server_translation(ctx.guild, "join_vc"), delete_after=10.0)
             return
         except discord.ClientException:
-            await ctx.respond(get_server_translation(ctx.guild, "unable2join"))
+            await ctx.respond(get_server_translation(ctx.guild, "unable2join"), delete_after=10.0)
             return
 
     player.autoplay = wavelink.AutoPlayMode.enabled
@@ -155,12 +155,12 @@ async def play(ctx: ApplicationContext, query: str):
     if not hasattr(player, "home"):
         player.home = ctx.channel
     elif player.home != ctx.channel:
-        await ctx.respond(get_server_translation(ctx.guild, "play_outside_home", channel=player.home.mention))
+        await ctx.respond(get_server_translation(ctx.guild, "play_outside_home", channel=player.home.mention), delete_after=10.0)
         return
 
     tracks: wavelink.Search = await wavelink.Playable.search(query)
     if not tracks:
-        await ctx.send(get_server_translation(ctx.guild, "track_not_found", user=mention(ctx.author)))
+        await ctx.send(get_server_translation(ctx.guild, "track_not_found", user=mention(ctx.author)), delete_after=10.0)
         return
 
     for track in tracks:
@@ -168,11 +168,11 @@ async def play(ctx: ApplicationContext, query: str):
 
     if isinstance(tracks, wavelink.Playlist):
         added: int = await player.queue.put_wait(tracks)
-        await ctx.respond(get_server_translation(ctx.guild, "added_playlist", pl_name=tracks.name, pl_count=added))
+        await ctx.respond(get_server_translation(ctx.guild, "added_playlist", pl_name=tracks.name, pl_count=added), delete_after=10.0)
     else:
         track: wavelink.Playable = tracks[0]
         await player.queue.put_wait(track)
-        await ctx.respond(get_server_translation(ctx.guild, "added_track", track=track.title))
+        await ctx.respond(get_server_translation(ctx.guild, "added_track", track=track.title), delete_after=10.0)
 
     if not player.playing:
         await player.play(player.queue.get(), volume=DEFAULT_VOLUME)
