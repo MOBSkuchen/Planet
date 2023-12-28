@@ -12,12 +12,22 @@ class ViewTemplate(View):
     async def update(self): pass
 
 
-class PlayButton(Button):
+class ButtonTemplate(Button):
     def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
         self.player = player
         self.original_view = original_view
         super().__init__()
 
+    def mod_button(self): pass
+
+    async def callback(self, interaction: Interaction):
+        self.mod_button()
+        await self.original_view.update()
+        await interaction.response.edit_message(view=self.original_view)
+        await self.original_view.update()
+
+
+class PlayButton(ButtonTemplate):
     def mod_button(self):
         if self.player.paused:  # Paused
             self.label = "Play"
@@ -25,20 +35,15 @@ class PlayButton(Button):
         else:
             self.label = "Pause"
             self.style = ButtonStyle.secondary
-
-    async def callback(self, interaction: Interaction):
         await self.player.pause(not self.player.paused)
-        self.mod_button()
-
-        await self.original_view.update()
-        await interaction.response.edit_message(view=self.original_view)
-        await self.original_view.update()
 
 
-class StopButton(Button):
+class StopButton(ButtonTemplate):
     def __init__(self, player: wavelink.Player, label: str):
         self.player = player
-        super().__init__(style=ButtonStyle.danger, label=label)
+        super().__init__(None, player)
+        self.label = label
+        self.style = ButtonStyle.danger
 
     async def callback(self, interaction: Interaction):
         await interaction.message.delete(reason="Playback stop")
