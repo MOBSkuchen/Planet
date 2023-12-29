@@ -60,9 +60,8 @@ class Planet(bridge.Bot):
     async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload) -> None:
         if payload.player is not None:
             await payload.player.associated_message.delete()
-        try:
-            await payload.player.filters_view_message.delte()
-        except Exception: pass  # Idc
+        if payload.player.filters_view_message is not None:
+            await payload.player.filters_view_message.delete()
 
     @staticmethod
     def get_player(ctx: ApplicationContext) -> wavelink.Player:
