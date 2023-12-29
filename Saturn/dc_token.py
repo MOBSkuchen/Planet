@@ -8,18 +8,18 @@ def load(filename="config.yml"):
         raise Exception(f"Config not found ({filename})")
     with open(filename, 'r') as stream:
         cfg = yaml.safe_load(stream)
-    if (_ := cfg["debug_guilds"]) is not None:
+    if (_ := cfg.get("debug_guilds")) is not None:
         debug_guilds = _
     else:
         debug_guilds = []
-    if (_ := cfg["storage"]) is not None:
+    if (_ := cfg.get("storage")) is not None:
         storage = _
     else:
         storage = "storage"
-    if TOKEN is None:
+    if cfg.get("token") is None:
         raise Exception(f"Token not found iny config ({filename})")
     else:
-        token = cfg["storage"]
+        token = cfg.get("token")
 
     return debug_guilds, storage, token
 

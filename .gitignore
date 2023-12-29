@@ -1,7 +1,6 @@
-token
 venv
 __pycache__
 .idea
 storage
-debug_guilds
+config.yml
 logs
