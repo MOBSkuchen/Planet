@@ -13,22 +13,25 @@ class ViewTemplate(View):
 
 
 class ButtonTemplate(Button):
-    def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
+    def __init__(self, original_view: ViewTemplate, player: wavelink.Player, org_label, org_style):
         self.player = player
         self.original_view = original_view
-        super().__init__()
+        super().__init__(label=org_label, style=org_style)
 
-    def mod_button(self): pass
+    async def mod_button(self): pass
 
     async def callback(self, interaction: Interaction):
-        self.mod_button()
+        await self.mod_button()
         await self.original_view.update()
         await interaction.response.edit_message(view=self.original_view)
         await self.original_view.update()
 
 
 class PlayButton(ButtonTemplate):
-    def mod_button(self):
+    def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
+        super().__init__(original_view, player, "Play" if player.paused else "Pause", ButtonStyle.primary if player.paused else ButtonStyle.secondary)
+
+    async def mod_button(self):
         if self.player.paused:  # Paused
             self.label = "Play"
             self.style = ButtonStyle.primary
@@ -39,7 +42,7 @@ class PlayButton(ButtonTemplate):
 
 
 class AutoPlayButton(ButtonTemplate):
-    def mod_button(self):
+    async def mod_button(self):
         if self.player.autoplay:
             self.label = "Disable Autoplay"
             self.style = ButtonStyle.secondary
@@ -52,9 +55,7 @@ class AutoPlayButton(ButtonTemplate):
 class StopButton(ButtonTemplate):
     def __init__(self, player: wavelink.Player, label: str):
         self.player = player
-        super().__init__(None, player)
-        self.label = label
-        self.style = ButtonStyle.danger
+        super().__init__(None, player, label, ButtonStyle.danger)
 
     async def callback(self, interaction: Interaction):
         await interaction.message.delete(reason="Playback stop")
@@ -70,13 +71,13 @@ class AudioPlayerView(ViewTemplate):
 
     async def update(self):
         await self.rem_all()
-        await self.add_all()
+        self.add_all()
 
     async def rem_all(self):
         self.remove_item(self.resume_button)
         self.remove_item(self.stop_button)
 
-    async def add_all(self):
+    def add_all(self):
         self.resume_button = PlayButton(self, self.player)
         self.stop_button = StopButton(self.player, "Stop")
 
