@@ -76,13 +76,16 @@ class AudioPlayerView(ViewTemplate):
     async def rem_all(self):
         self.remove_item(self.resume_button)
         self.remove_item(self.stop_button)
+        self.remove_item(self.filter_button)
 
     def add_all(self):
         self.resume_button = PlayButton(self, self.player)
         self.stop_button = StopButton(self.player, "Stop")
+        self.filter_button = OpenFilterView(self.player)
 
         self.add_item(self.resume_button)
         self.add_item(self.stop_button)
+        self.add_item(self.filter_button)
 
 
 def _lang_opt(name: str, guid):
@@ -163,8 +166,9 @@ class FilterTemplate(Button):
 
     async def callback(self, interaction: Interaction):
         filters: wavelink.Filters = self.player.filters
-        filters.__getattribute__(self.attr).timescale.set(**self.kwargs)
+        filters.__getattribute__(self.attr).set(**self.kwargs)
         await self.player.set_filters(filters)
+        await interaction.response.send_message(f"Applied filter ({self.label})", delete_after=1.0)
 
 
 class ResetFilter(Button):
@@ -176,25 +180,55 @@ class ResetFilter(Button):
         filters: wavelink.Filters = self.player.filters
         filters.reset()
         await self.player.set_filters(filters)
+        await interaction.response.send_message(f"Reset filter(s). This may take a few seconds", delete_after=2.0)
 
 
 class CloseButton(Button):
-    def __init__(self, player: wavelink.Player):
+    def __init__(self, player: wavelink.Player, fv):
         self.player = player
+        self.fv = fv
         super().__init__(style=ButtonStyle.danger, label="Close")
 
     async def callback(self, interaction: Interaction):
-        await (await interaction.original_response()).delete()
+        await self.fv.org_msg.delete()
 
 
 class FiltersView(ViewTemplate):
     def __init__(self, player: wavelink.Player):
         self.player = player
         super().__init__()
+        self.add_all()
+        self.org_msg = None
 
-    async def add_all(self):
-        self.nightcore = FilterTemplate(self.player, "timescale", "Nightcore", pitch=1.2, speed=1.2, rate=1)
+    def add_all(self):
+        self.nightcore = FilterTemplate(self.player, "timescale", "Nightcore", speed=1.2, rate=1)
+        self.slowed = FilterTemplate(self.player, "timescale", "Slowed", speed=0.8)
+        self.sped_up = FilterTemplate(self.player, "timescale", "Sped up", speed=1.4)
+        self.close_button = CloseButton(self.player, self)
+        self.reset_button = ResetFilter(self.player)
         self.add_item(self.nightcore)
+        self.add_item(self.slowed)
+        self.add_item(self.sped_up)
+        self.add_item(self.close_button)
+        self.add_item(self.reset_button)
 
-    async def rem_all(self):
+    def rem_all(self):
         self.remove_item(self.nightcore)
+        self.remove_item(self.slowed)
+        self.remove_item(self.sped_up)
+        self.remove_item(self.close_button)
+        self.remove_item(self.reset_button)
+
+
+class OpenFilterView(Button):
+    def __init__(self, player: wavelink.Player):
+        self.player = player
+        super().__init__(label="Open Filter Menu", style=ButtonStyle.green)
+
+    async def callback(self, interaction: Interaction):
+        fv = FiltersView(self.player)
+        org_msg: Interaction = await interaction.response.send_message("""Available filters:
+- Nightcore (Pitch 1.2 & Speed 1.2)
+- Slowed    (Speed 0.8)
+- Sped up   (Speed 1.4)""", view=fv)
+        fv.org_msg = (await org_msg.original_response())
