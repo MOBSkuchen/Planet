@@ -11,11 +11,11 @@ FILTERS_VIEW_MESSAGE_TEXT = """Available filters:
 
 
 class ViewTemplate(View):
-    async def rem_all(self): pass
+    def rem_all(self): pass
 
-    async def add_all(self): pass
+    def add_all(self): pass
 
-    async def update(self): pass
+    def update(self): pass
 
 
 class ButtonTemplate(Button):
@@ -28,9 +28,9 @@ class ButtonTemplate(Button):
 
     async def callback(self, interaction: Interaction):
         await self.mod_button()
-        await self.original_view.update()
+        self.original_view.update()
         await interaction.response.edit_message(view=self.original_view)
-        await self.original_view.update()
+        self.original_view.update()
 
 
 class PlayButton(ButtonTemplate):
@@ -48,14 +48,17 @@ class PlayButton(ButtonTemplate):
 
 
 class AutoPlayButton(ButtonTemplate):
+    def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
+        super().__init__(original_view, player,
+                         "Disable Autoplay" if player.autoplay else "Enable Autoplay",
+                         ButtonStyle.blurple)
+
     async def mod_button(self):
-        if self.player.autoplay:
+        if self.player.autoplay.value:
             self.label = "Disable Autoplay"
-            self.style = ButtonStyle.secondary
         else:
             self.label = "Enable Autoplay"
-            self.style = ButtonStyle.primary
-        self.player.autoplay = not self.player.autoplay
+        self.player.autoplay = wavelink.AutoPlayMode(value=not self.player.autoplay.value)
 
 
 class StopButton(ButtonTemplate):
@@ -76,22 +79,25 @@ class AudioPlayerView(ViewTemplate):
         self.add_all()
 
     async def update(self):
-        await self.rem_all()
+        self.rem_all()
         self.add_all()
 
-    async def rem_all(self):
+    def rem_all(self):
         self.remove_item(self.resume_button)
         self.remove_item(self.stop_button)
         self.remove_item(self.filter_button)
+        self.remove_item(self.autoplay_button)
 
     def add_all(self):
         self.resume_button = PlayButton(self, self.player)
         self.stop_button = StopButton(self.player, "Stop")
         self.filter_button = OpenFilterView(self.player)
+        self.autoplay_button = AutoPlayButton(self, self.player)
 
         self.add_item(self.resume_button)
         self.add_item(self.stop_button)
         self.add_item(self.filter_button)
+        self.add_item(self.autoplay_button)
 
 
 def _lang_opt(name: str, guid):
