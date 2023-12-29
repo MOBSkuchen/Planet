@@ -6,7 +6,7 @@ import yaml
 import discord
 import wavelink
 from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
-    get_embed, mention, AudioPlayerView, FiltersView
+    get_embed, mention, AudioPlayerView, FiltersView, FILTERS_VIEW_MESSAGE_TEXT
 
 
 def load_lavalink_config(filename="application.yml"):
@@ -188,7 +188,7 @@ async def filter(ctx: ApplicationContext):
         await ctx.respond(get_server_translation(ctx.guild, "only_playback"))
         return
 
-    await ctx.respond("", view=FiltersView(player))
+    await ctx.respond(FILTERS_VIEW_MESSAGE_TEXT, view=FiltersView(player))
 
 
 def launch():
