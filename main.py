@@ -5,11 +5,11 @@ import warnings
 import yaml
 import discord
 import wavelink
-from Saturn import retrieve_token, retrieve_debug_guilds, SettingView, servers, Translation, get_server_translation, \
+from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
     get_embed, mention, AudioPlayerView, FiltersView
 
 
-def auto_load_yml(filename="application.yml"):
+def load_lavalink_config(filename="application.yml"):
     with open(filename, 'r') as stream:
         loaded = yaml.safe_load(stream)
     uri = f'http://{loaded["server"]["address"]}:{loaded["server"]["port"]}'
@@ -19,7 +19,6 @@ def auto_load_yml(filename="application.yml"):
 
 warnings.filterwarnings("ignore")
 
-TEST_GUILDS = retrieve_debug_guilds()
 ANON_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Missing_avatar.svg/2048px-Missing_avatar.svg.png"
 translation = Translation.make_translations("translations/*")
 DEFAULT_VOLUME = 100
@@ -46,7 +45,7 @@ class Planet(bridge.Bot):
             return
 
     async def setup_hook(self) -> None:
-        nodes = [wavelink.Node(**auto_load_yml())]
+        nodes = [wavelink.Node(**load_lavalink_config())]
         await wavelink.Pool.connect(nodes=nodes, client=self, cache_capacity=100)
 
     async def on_wavelink_track_start(self, payload: wavelink.TrackStartEventPayload) -> None:
@@ -69,7 +68,7 @@ class Planet(bridge.Bot):
 
 
 intents: discord.flags.Intents = Intents.all()
-client = Planet(intents=intents, debug_guilds=TEST_GUILDS)
+client = Planet(intents=intents, debug_guilds=DEBUG_GUILDS)
 
 
 @client.event
@@ -189,7 +188,7 @@ async def filter(ctx: ApplicationContext):
 
 
 def launch():
-    client.run(retrieve_token())
+    client.run(TOKEN)
 
 
 if __name__ == '__main__':

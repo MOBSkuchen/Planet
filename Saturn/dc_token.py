@@ -1,27 +1,27 @@
 import os
+import yaml
 
 
-def _join(filename, path):
-    if path is None:
-        path = os.getcwd()
+def load(filename="config.yml"):
+    global DEBUG_GUILDS, TOKEN, STORAGE
+    if not os.path.exists(filename):
+        raise Exception(f"Config not found ({filename})")
+    with open(filename, 'r') as stream:
+        cfg = yaml.safe_load(stream)
+    if (_ := cfg["debug_guilds"]) is not None:
+        debug_guilds = _
+    else:
+        debug_guilds = []
+    if (_ := cfg["storage"]) is not None:
+        storage = _
+    else:
+        storage = "storage"
+    if TOKEN is None:
+        raise Exception(f"Token not found iny config ({filename})")
+    else:
+        token = cfg["storage"]
 
-    return os.path.join(path, filename)
+    return debug_guilds, storage, token
 
 
-def retrieve(path):
-    with open(path, 'r') as file:
-        content = file.read()
-    return content
-
-
-def retrieve_token(filename="token", path=None):
-    path = _join(filename, path)
-    return retrieve(path)
-
-
-def retrieve_debug_guilds(filename="debug_guilds", path=None):
-    path = _join(filename, path)
-    if not os.path.exists(path):
-        print("WARNING: No debug guilds were found!")
-        return []
-    return list(map(int, retrieve(path).splitlines()))
+DEBUG_GUILDS, STORAGE, TOKEN = load()

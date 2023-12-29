@@ -3,6 +3,7 @@ from glob import glob
 import shutil
 import json
 from discord import *
+from Saturn import STORAGE
 
 
 def _create_file(filename):
@@ -243,4 +244,4 @@ class Servers(Group):
 
 
 _check_storage()
-servers = Servers("storage/servers")
+servers = Servers(os.path.join(STORAGE, "servers"))
