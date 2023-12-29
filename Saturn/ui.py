@@ -4,6 +4,12 @@ from discord.ui import Button, View, Select
 from Saturn import LANG_EMOJI_MAP, servers, get_server_translation
 
 
+FILTERS_VIEW_MESSAGE_TEXT = """Available filters:
+- Nightcore (Pitch 1.2 & Speed 1.2)
+- Slowed    (Speed 0.8)
+- Sped up   (Speed 1.4)"""
+
+
 class ViewTemplate(View):
     async def rem_all(self): pass
 
@@ -184,13 +190,12 @@ class ResetFilter(Button):
 
 
 class CloseButton(Button):
-    def __init__(self, player: wavelink.Player, fv):
+    def __init__(self, player: wavelink.Player):
         self.player = player
-        self.fv = fv
         super().__init__(style=ButtonStyle.danger, label="Close")
 
     async def callback(self, interaction: Interaction):
-        await self.fv.org_msg.delete()
+        await self.player.filters_view_message.delete()
 
 
 class FiltersView(ViewTemplate):
@@ -204,7 +209,7 @@ class FiltersView(ViewTemplate):
         self.nightcore = FilterTemplate(self.player, "timescale", "Nightcore", speed=1.2, rate=1)
         self.slowed = FilterTemplate(self.player, "timescale", "Slowed", speed=0.8)
         self.sped_up = FilterTemplate(self.player, "timescale", "Sped up", speed=1.4)
-        self.close_button = CloseButton(self.player, self)
+        self.close_button = CloseButton(self.player)
         self.reset_button = ResetFilter(self.player)
         self.add_item(self.nightcore)
         self.add_item(self.slowed)
@@ -227,8 +232,5 @@ class OpenFilterView(Button):
 
     async def callback(self, interaction: Interaction):
         fv = FiltersView(self.player)
-        org_msg: Interaction = await interaction.response.send_message("""Available filters:
-- Nightcore (Pitch 1.2 & Speed 1.2)
-- Slowed    (Speed 0.8)
-- Sped up   (Speed 1.4)""", view=fv)
-        fv.org_msg = (await org_msg.original_response())
+        org_msg: Interaction = await interaction.response.send_message(FILTERS_VIEW_MESSAGE_TEXT, view=fv)
+        self.player.filters_view_message = (await org_msg.original_response())

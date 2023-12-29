@@ -27,6 +27,7 @@ MAX_VOLUME = 500
 __version__ = "4.1"
 
 wavelink.Player.associated_message = None
+wavelink.Player.filters_view_message = None
 
 
 class Planet(bridge.Bot):
@@ -59,6 +60,9 @@ class Planet(bridge.Bot):
     async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload) -> None:
         if payload.player is not None:
             await payload.player.associated_message.delete()
+        try:
+            await payload.player.filters_view_message.delte()
+        except Exception: pass  # Idc
 
     @staticmethod
     def get_player(ctx: ApplicationContext) -> wavelink.Player:
