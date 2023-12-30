@@ -103,6 +103,7 @@ class AudioPlayerView(ViewTemplate):
 
     def create_all(self):
         self.all_items = [PlayButton(self, self.player),
+                          SkipButton(self, self.player),
                           StopButton(self.player, "Stop"),
                           OpenFilterView(self.player),
                           AutoPlayButton(self, self.player)]
