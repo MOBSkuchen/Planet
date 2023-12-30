@@ -15,7 +15,7 @@ def serve_filters_view_message(player: wavelink.Player):
     msg = FILTERS_VIEW_MESSAGE_TEXT
     items = player.filters.timescale.payload.items()
     if len(items) != 0:
-        applied = ", ".join(f'{n}: {v}' for n, v in items)
+        applied = ", ".join(f'{n.capitalize()}: {v}' for n, v in items)
     else:
         applied = "None"
     return msg.format(cur_applied_filters=applied)

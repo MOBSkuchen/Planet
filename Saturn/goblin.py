@@ -57,7 +57,7 @@ def get_embed(player: wavelink.Player, track: wavelink.Playable, recommended):
     if recommended:
         requester = track.source
         requester[0].upper()
-        requester_name = requester
+        requester_name = requester.capitalize()
     else:
         requester = get_user(track.extras.requested_by, guild)
         requester_name = requester.name
