@@ -188,7 +188,7 @@ async def filter(ctx: ApplicationContext):
         await ctx.respond(get_server_translation(ctx.guild, "only_playback"))
         return
 
-    await ctx.respond(serve_filters_view_message(player), view=FiltersView(player))
+    player.filters_view_message = await ctx.respond(serve_filters_view_message(player), view=FiltersView(player))
 
 
 def launch():
