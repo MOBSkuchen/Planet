@@ -135,8 +135,8 @@ async def volume(ctx: ApplicationContext, percent: int):
     await ctx.respond(get_server_translation(ctx.guild, "volume_set", volume=percent))
 
 
-@client.slash_command(name="play")
-@option("query", description="Play a song!", required=True)
+@client.slash_command(name="play", description="Play a song!")
+@option("query", description="Search for a song", required=True)
 async def play(ctx: ApplicationContext, query: str):
     if not ctx.guild:
         return
@@ -181,7 +181,7 @@ async def play(ctx: ApplicationContext, query: str):
         await player.play(player.queue.get(), volume=DEFAULT_VOLUME)
 
 
-@client.slash_command(name="filter")
+@client.slash_command(name="filter", description="Open filter menu")
 async def filter(ctx: ApplicationContext):
     player = client.get_player(ctx)
     if player is None:
