@@ -35,15 +35,10 @@ class ButtonTemplate(Button):
 
 class PlayButton(ButtonTemplate):
     def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
-        super().__init__(original_view, player, "Play" if player.paused else "Pause", ButtonStyle.primary if player.paused else ButtonStyle.secondary)
+        super().__init__(original_view, player, "Play" if player.paused else "Pause", ButtonStyle.primary)
 
     async def mod_button(self):
-        if self.player.paused:  # Paused
-            self.label = "Play"
-            self.style = ButtonStyle.primary
-        else:
-            self.label = "Pause"
-            self.style = ButtonStyle.secondary
+        self.label = "Play" if self.player.paused else "Pause"
         await self.player.pause(not self.player.paused)
 
 
