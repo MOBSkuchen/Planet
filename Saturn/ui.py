@@ -73,7 +73,7 @@ class PlayButton(ButtonTemplate):
 class AutoPlayButton(ButtonTemplate):
     def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
         super().__init__(original_view, player,
-                         "Disable Autoplay" if player.autoplay else "Enable Autoplay",
+                         "Disable Autoplay" if player.autoplay.value else "Enable Autoplay",
                          ButtonStyle.blurple)
 
     async def mod_button(self):
