@@ -44,6 +44,14 @@ class ButtonTemplate(Button):
         self.original_view.update()
 
 
+class SkipButton(ButtonTemplate):
+    def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
+        super().__init__(original_view, player, "Skip", ButtonStyle.link)
+
+    async def mod_button(self):
+        await self.player.skip()
+
+
 class PlayButton(ButtonTemplate):
     def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
         super().__init__(original_view, player, "Play" if player.paused else "Pause", ButtonStyle.primary)
