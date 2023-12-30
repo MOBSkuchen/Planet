@@ -22,11 +22,20 @@ def serve_filters_view_message(player: wavelink.Player):
 
 
 class ViewTemplate(View):
-    def rem_all(self): pass
+    def rem_all(self):
+        for i in self.all_items:
+            self.remove_item(i)
 
-    def add_all(self): pass
+    def add_all(self):
+        self.create_all()
+        for i in self.all_items:
+            self.add_item(i)
 
-    def update(self): pass
+    def create_all(self): pass
+
+    def update(self):
+        self.rem_all()
+        self.add_all()
 
 
 class ButtonTemplate(Button):
@@ -92,26 +101,11 @@ class AudioPlayerView(ViewTemplate):
 
         self.add_all()
 
-    async def update(self):
-        self.rem_all()
-        self.add_all()
-
-    def rem_all(self):
-        self.remove_item(self.resume_button)
-        self.remove_item(self.stop_button)
-        self.remove_item(self.filter_button)
-        self.remove_item(self.autoplay_button)
-
-    def add_all(self):
-        self.resume_button = PlayButton(self, self.player)
-        self.stop_button = StopButton(self.player, "Stop")
-        self.filter_button = OpenFilterView(self.player)
-        self.autoplay_button = AutoPlayButton(self, self.player)
-
-        self.add_item(self.resume_button)
-        self.add_item(self.stop_button)
-        self.add_item(self.filter_button)
-        self.add_item(self.autoplay_button)
+    def create_all(self):
+        self.all_items = [PlayButton(self, self.player),
+                          StopButton(self.player, "Stop"),
+                          OpenFilterView(self.player),
+                          AutoPlayButton(self, self.player)]
 
 
 def _lang_opt(name: str, guid):
@@ -124,7 +118,7 @@ def _lang_opt(name: str, guid):
     return SelectOption(label=name, emoji=emoji_)
 
 
-class LanguagesSettingView(ViewTemplate):
+class LanguagesSettingView(View):
     def __init__(self, root):
         self.root = root
         super().__init__()
@@ -225,24 +219,11 @@ class FiltersView(ViewTemplate):
         self.add_all()
         self.org_msg = None
 
-    def add_all(self):
-        self.nightcore = FilterTemplate(self.player, "timescale", "Nightcore", speed=1.2, rate=1, pitch=1.2)
-        self.slowed = FilterTemplate(self.player, "timescale", "Slowed", speed=0.8)
-        self.sped_up = FilterTemplate(self.player, "timescale", "Sped up", speed=1.4)
-        self.close_button = CloseButton(self.player)
-        self.reset_button = ResetFilter(self.player)
-        self.add_item(self.nightcore)
-        self.add_item(self.slowed)
-        self.add_item(self.sped_up)
-        self.add_item(self.close_button)
-        self.add_item(self.reset_button)
-
-    def rem_all(self):
-        self.remove_item(self.nightcore)
-        self.remove_item(self.slowed)
-        self.remove_item(self.sped_up)
-        self.remove_item(self.close_button)
-        self.remove_item(self.reset_button)
+    def create_all(self):
+        self.all_items = [FilterTemplate(self.player, "timescale", "Nightcore", speed=1.2, rate=1, pitch=1.2),
+                          FilterTemplate(self.player, "timescale", "Slowed", speed=0.8),
+                          FilterTemplate(self.player, "timescale", "Sped up", speed=1.4),
+                          CloseButton(self.player), ResetFilter(self.player)]
 
 
 class OpenFilterView(Button):
