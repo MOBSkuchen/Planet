@@ -1,7 +1,14 @@
 import random
 import string
-from discord import Guild, User, VoiceClient, Client
+from discord import Guild, User, VoiceClient, Client, Member
 from discord.utils import get
+
+
+ANON_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Missing_avatar.svg/2048px-Missing_avatar.svg.png"
+ICON_URLS = {
+    "spotify": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/2048px-Spotify_logo_without_text.svg.png",
+    "youtube": "https://yt3.googleusercontent.com/584JjRp5QMuKbyduM_2k5RlXFqHJtQ0qLIPZpwbUjMJmgzZngHcam5JMuZQxyzGMV5ljwJRl0Q=s900-c-k-c0x00ffffff-no-rj"
+}
 
 
 def mention(user_: User) -> str:
@@ -56,3 +63,9 @@ def get_vc_from_guild(client_: Client, guild_: Guild) -> VoiceClient | None:
 
 def get_user(user_id: int, guild: Guild) -> User:
     return get(guild.members, id=user_id)
+
+
+def get_icon_url(requester):
+    if isinstance(requester, Member):
+        return ANON_AVATAR if not requester.avatar else requester.avatar.url
+    return ICON_URLS[requester.lower()]

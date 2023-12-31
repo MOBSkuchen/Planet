@@ -1,5 +1,5 @@
 import threading
-from discord import User, Message, Member, Intents, ApplicationContext, option, default_permissions, TextChannel
+from discord import User, Message, Member, Intents, ApplicationContext, option, default_permissions, Embed
 from discord.ext import bridge
 from typing import cast
 import warnings
@@ -8,9 +8,8 @@ import discord
 import wavelink
 from dataclasses import dataclass
 import asyncio
-import time
 from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
-    get_embed, mention, AudioPlayerView, FiltersView, serve_filters_view_message, PollView
+    get_embed, mention, AudioPlayerView, FiltersView, serve_filters_view_message, PollView, get_icon_url
 
 
 @dataclass
@@ -20,6 +19,7 @@ class PollDataClass:
     options: dict[str, str]
     original_message: Message
     duration: int
+    author: User
 
     def get_winner(self):
         return {self.options[k]: v for k, v in sorted(list(map(
@@ -34,11 +34,17 @@ class PollDataClass:
 
     async def _poll(self):
         await asyncio.sleep(self.duration)
-        msg = f"Poll ended!\n**{self.title}**\n"
+        embed = Embed()
+        embed.set_author(name=f"{self.author.name}'s poll has ended", icon_url=get_icon_url(self.author))
+        embed.title = self.title
+        embed.colour = self.author.colour  # ewww
+        a = 0
         for i, (n, v) in enumerate(self.get_winner().items()):
             if i == 0: n = f'__{n}__'
-            msg += f"**{i + 1}**. {n} [{v} votes]\n"
-        await self.original_message.channel.send(msg)
+            embed.add_field(name=f"{i+1}. {n}", value=f'{v} votes')
+            a += v
+        embed.title += f" [{a} total votes]"
+        await self.original_message.channel.send(embed=embed)
         await self.original_message.delete_original_response()
 
 
@@ -57,7 +63,7 @@ translation = Translation.make_translations("translations/*")
 DEFAULT_VOLUME = 100
 MAX_VOLUME = 500
 
-__version__ = "4.1"
+__version__ = "4.2"
 
 wavelink.Player.associated_message = None
 wavelink.Player.filters_view_message = None
@@ -141,7 +147,7 @@ async def poll(ctx: ApplicationContext, title, option1, option2,
     if option4 is not None: options["D"] = option4
     pv = PollView(options)
     msg = await ctx.respond(f"{ctx.user.mention} started a Poll!\n**{title}**", view=pv)
-    data = PollDataClass(title, pv.general_group, options, msg, duration)
+    data = PollDataClass(title, pv.general_group, options, msg, duration, ctx.user)
     data.start_poll()
 
 

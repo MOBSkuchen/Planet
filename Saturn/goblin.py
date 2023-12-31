@@ -5,21 +5,10 @@ from discord import Embed, User, Member
 from sklearn.cluster import KMeans
 import numpy as np
 import urllib.request
-from Saturn import get_bucket, get_server_translation, time_format, get_user, random_id
+from Saturn import get_bucket, get_server_translation, time_format, get_user, random_id, get_icon_url
 
-ANON_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Missing_avatar.svg/2048px-Missing_avatar.svg.png"
-ICON_URLS = {
-    "spotify": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/2048px-Spotify_logo_without_text.svg.png",
-    "youtube": "https://yt3.googleusercontent.com/584JjRp5QMuKbyduM_2k5RlXFqHJtQ0qLIPZpwbUjMJmgzZngHcam5JMuZQxyzGMV5ljwJRl0Q=s900-c-k-c0x00ffffff-no-rj"
-}
 music_files_bucket = get_bucket("storage/music")
 DEFAULT_COLOR = 0x000000
-
-
-def get_icon_url(requester):
-    if isinstance(requester, Member):
-        return ANON_AVATAR if not requester.avatar else requester.avatar.url
-    return ICON_URLS[requester.lower()]
 
 
 def get_color(thumbnail):
