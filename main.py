@@ -34,10 +34,8 @@ class PollDataClass:
 
     async def _poll(self):
         await asyncio.sleep(self.duration)
-        embed = Embed()
+        embed = Embed(title=self.title, colour=self.author.colour)
         embed.set_author(name=f"{self.author.name}'s poll has ended", icon_url=get_icon_url(self.author))
-        embed.title = self.title
-        embed.colour = self.author.colour  # ewww
         a = 0
         for i, (n, v) in enumerate(self.get_winner().items()):
             if i == 0: n = f'__{n}__'
@@ -146,7 +144,9 @@ async def poll(ctx: ApplicationContext, title, option1, option2,
     if option3 is not None: options["C"] = option3
     if option4 is not None: options["D"] = option4
     pv = PollView(options)
-    msg = await ctx.respond(f"{ctx.user.mention} started a Poll!\n**{title}**", view=pv)
+    embed = Embed(title=title, colour=ctx.user.colour)
+    embed.set_author(name=f"{ctx.user.name} has started a poll!", icon_url=get_icon_url(ctx.user))
+    msg = await ctx.respond(embed=embed, view=pv)
     data = PollDataClass(title, pv.general_group, options, msg, duration, ctx.user)
     data.start_poll()
 
