@@ -252,7 +252,6 @@ class PollButton(Button):
             else:
                 if uid in g:
                     g.remove(uid)
-        # await interaction.response.send_message("Vote submitted!", delete_after=.1)
 
 
 class PollView(ViewTemplate):

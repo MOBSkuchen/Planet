@@ -1,7 +1,6 @@
-import os
 import cv2
 import wavelink
-from discord import Embed, User, Member
+from discord import Embed
 from sklearn.cluster import KMeans
 import numpy as np
 import urllib.request
