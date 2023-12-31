@@ -1,12 +1,45 @@
-from discord import User, Message, Member, Intents, ApplicationContext, option, default_permissions
+import threading
+from discord import User, Message, Member, Intents, ApplicationContext, option, default_permissions, TextChannel
 from discord.ext import bridge
 from typing import cast
 import warnings
 import yaml
 import discord
 import wavelink
+from dataclasses import dataclass
+import asyncio
+import time
 from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
-    get_embed, mention, AudioPlayerView, FiltersView, serve_filters_view_message
+    get_embed, mention, AudioPlayerView, FiltersView, serve_filters_view_message, PollView
+
+
+@dataclass
+class PollDataClass:
+    title: str
+    general_group: dict[str, set[int]]
+    options: dict[str, str]
+    original_message: Message
+    duration: int
+
+    def get_winner(self):
+        return {self.options[k]: v for k, v in sorted(list(map(
+            lambda v: (v[0], len(v[1])), self.general_group.items())), key=lambda item: item[1], reverse=True)}
+
+    def start_poll(self):
+        proc = threading.Thread(target=self.poll)
+        proc.start()
+
+    def poll(self):
+        asyncio.run_coroutine_threadsafe(self._poll(), client.loop)
+
+    async def _poll(self):
+        await asyncio.sleep(self.duration)
+        msg = f"Poll ended!\n**{self.title}**\n"
+        for i, (n, v) in enumerate(self.get_winner().items()):
+            if i == 0: n = f'__{n}__'
+            msg += f"**{i + 1}**. {n} [{v} votes]\n"
+        await self.original_message.channel.send(msg)
+        await self.original_message.delete_original_response()
 
 
 def load_lavalink_config(filename="application.yml"):
@@ -94,6 +127,24 @@ async def clear(ctx: ApplicationContext, amount: int):
         delete_after=10.0)
 
 
+@client.slash_command(name="poll", description="Create a poll")
+@option(name="title", description="Title of the pole")
+@option(name="option1", description="First option", required=True)
+@option(name="option2", description="Second option", required=True)
+@option(name="duration", description="Poll duration (in seconds)", default=60, required=False)
+@option(name="option3", description="Third option", required=False)
+@option(name="option4", description="Fourth option", required=False)
+async def poll(ctx: ApplicationContext, title, option1, option2,
+               duration: int, option3=None, option4=None):
+    options = {"A": option1, "B": option2}
+    if option3 is not None: options["C"] = option3
+    if option4 is not None: options["D"] = option4
+    pv = PollView(options)
+    msg = await ctx.respond(f"{ctx.user.mention} started a Poll!\n**{title}**", view=pv)
+    data = PollDataClass(title, pv.general_group, options, msg, duration)
+    data.start_poll()
+
+
 @client.slash_command(name="manage", description="Manage Planet's server settings")
 async def manage(ctx: ApplicationContext):
     servers.init_and_get(ctx.guild)
@@ -158,12 +209,14 @@ async def play(ctx: ApplicationContext, query: str):
     if not hasattr(player, "home"):
         player.home = ctx.channel
     elif player.home != ctx.channel:
-        await ctx.respond(get_server_translation(ctx.guild, "play_outside_home", channel=player.home.mention), delete_after=10.0)
+        await ctx.respond(get_server_translation(ctx.guild, "play_outside_home", channel=player.home.mention),
+                          delete_after=10.0)
         return
 
     tracks: wavelink.Search = await wavelink.Playable.search(query)
     if not tracks:
-        await ctx.send(get_server_translation(ctx.guild, "track_not_found", user=mention(ctx.author)), delete_after=10.0)
+        await ctx.send(get_server_translation(ctx.guild, "track_not_found", user=mention(ctx.author)),
+                       delete_after=10.0)
         return
 
     for track in tracks:
@@ -171,7 +224,8 @@ async def play(ctx: ApplicationContext, query: str):
 
     if isinstance(tracks, wavelink.Playlist):
         added: int = await player.queue.put_wait(tracks)
-        await ctx.respond(get_server_translation(ctx.guild, "added_playlist", pl_name=tracks.name, pl_count=added), delete_after=10.0)
+        await ctx.respond(get_server_translation(ctx.guild, "added_playlist", pl_name=tracks.name, pl_count=added),
+                          delete_after=10.0)
     else:
         track: wavelink.Playable = tracks[0]
         await player.queue.put_wait(track)

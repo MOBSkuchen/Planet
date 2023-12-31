@@ -38,7 +38,7 @@ class ViewTemplate(View):
         self.add_all()
 
 
-class ButtonTemplate(Button):
+class PlayerButtonTemplate(Button):
     def __init__(self, original_view: ViewTemplate, player: wavelink.Player, org_label, org_style):
         self.player = player
         self.original_view = original_view
@@ -53,14 +53,14 @@ class ButtonTemplate(Button):
         self.original_view.update()
 
 
-class SkipButton(ButtonTemplate):
+class SkipButton(PlayerButtonTemplate):
     def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
         super().__init__(original_view, player, "Skip", ButtonStyle.primary)
 
     async def callback(self, interaction: Interaction): await self.player.skip()
 
 
-class PlayButton(ButtonTemplate):
+class PlayButton(PlayerButtonTemplate):
     def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
         super().__init__(original_view, player, "Play" if player.paused else "Pause", ButtonStyle.primary)
 
@@ -69,7 +69,7 @@ class PlayButton(ButtonTemplate):
         await self.player.pause(not self.player.paused)
 
 
-class AutoPlayButton(ButtonTemplate):
+class AutoPlayButton(PlayerButtonTemplate):
     def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
         super().__init__(original_view, player,
                          "Disable Autoplay" if player.autoplay.value else "Enable Autoplay",
@@ -83,7 +83,7 @@ class AutoPlayButton(ButtonTemplate):
         self.player.autoplay = wavelink.AutoPlayMode(value=not self.player.autoplay.value)
 
 
-class StopButton(ButtonTemplate):
+class StopButton(PlayerButtonTemplate):
     def __init__(self, player: wavelink.Player, label: str):
         self.player = player
         super().__init__(None, player, label, ButtonStyle.danger)
@@ -235,3 +235,36 @@ class OpenFilterView(Button):
         fv = FiltersView(self.player)
         org_msg: Interaction = await interaction.response.send_message(serve_filters_view_message(self.player), view=fv)
         self.player.filters_view_message = (await org_msg.original_response())
+
+
+class PollButton(Button):
+    def __init__(self, name, fv, attach_group):
+        self.name = name
+        self.general_group_m = fv
+        self.attach_group = attach_group
+        super().__init__(label=name,  style=ButtonStyle.primary)
+
+    async def callback(self, interaction: Interaction):
+        uid = interaction.user.id
+        for i, g in self.general_group_m.general_group.items():
+            if i == self.attach_group:
+                g.add(uid)
+            else:
+                if uid in g:
+                    g.remove(uid)
+        # await interaction.response.send_message("Vote submitted!", delete_after=.1)
+
+
+class PollView(ViewTemplate):
+    def __init__(self, options):
+        self.options = options
+        super().__init__()
+        self.add_all()
+
+    def create_all(self):
+        self.all_items = []
+        self.general_group = {}
+        for i, v in self.options.items():
+            attach_group = set()
+            self.general_group[i] = attach_group
+            self.all_items.append(PollButton(v, self, i))
