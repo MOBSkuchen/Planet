@@ -35,13 +35,13 @@ class PollDataClass:
     async def _poll(self):
         await asyncio.sleep(self.duration)
         embed = Embed(title=self.title, colour=self.author.colour)
-        embed.set_author(name=f"{self.author.name}'s poll has ended", icon_url=get_icon_url(self.author))
+        embed.set_author(name=get_server_translation(self.original_message.guild, 'poll_ended', author=self.author.name), icon_url=get_icon_url(self.author))
         a = 0
         for i, (n, v) in enumerate(self.get_winner().items()):
             if i == 0: n = f'__{n}__'
-            embed.add_field(name=f"{i+1}. {n}", value=f'{v} votes')
+            embed.add_field(name=f"{i+1}. {n}", value=f'{v} {get_server_translation(self.original_message.guild, "votes")}')
             a += v
-        embed.title += f" [{a} total votes]"
+        embed.title += f" [{a} {get_server_translation(self.original_message.guild, 'total_votes')}]"
         await self.original_message.channel.send(embed=embed)
         await self.original_message.delete_original_response()
 
@@ -145,7 +145,7 @@ async def poll(ctx: ApplicationContext, title, option1, option2,
     if option4 is not None: options["D"] = option4
     pv = PollView(options)
     embed = Embed(title=title, colour=ctx.user.colour)
-    embed.set_author(name=f"{ctx.user.name} has started a poll!", icon_url=get_icon_url(ctx.user))
+    embed.set_author(name=get_server_translation(ctx.guild, 'poll_started', author=ctx.user.name), icon_url=get_icon_url(ctx.user))
     msg = await ctx.respond(embed=embed, view=pv)
     data = PollDataClass(title, pv.general_group, options, msg, duration, ctx.user)
     data.start_poll()

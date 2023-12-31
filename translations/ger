@@ -17,3 +17,7 @@ skipped_songs;**$amount** song(s) übersprungen
 done;Fertig
 only_playback;Diese Aktion ist nur während der Wiedergabe erlaubt
 set_servers_lang;Server sprache zu **$lang** gesetzt
+poll_started;**$author** hat eine Umfrage gestartet
+poll_ended;**$author**s Umfrage ist zuende
+total_votes;insgesamte Stimmen
+votes;Stimmen
