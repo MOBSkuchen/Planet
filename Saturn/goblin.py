@@ -21,7 +21,8 @@ def get_color(thumbnail):
     _, labels, center = cv2.kmeans(pixels, 1, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
     center = np.uint8(center)
     dominant_color = center[np.argmax(np.unique(labels, return_counts=True)[1])]
-    dominant_color = int("0x" + '%02x%02x%02x' % tuple(int(c) for c in dominant_color[len(dominant_color) - 1][1]), base=16)
+    dominant_color = list(dominant_color)
+    dominant_color = int("0x" + '%02x%02x%02x' % tuple(int(c) for c in dominant_color), base=16)
     music_files_bucket.Fdel(filename)
     return dominant_color
 
