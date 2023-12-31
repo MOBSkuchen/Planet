@@ -11,7 +11,6 @@ import asyncio
 from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
     get_embed, mention, AudioPlayerView, FiltersView, serve_filters_view_message, PollView, get_icon_url
 
-
 @dataclass
 class PollDataClass:
     title: str
@@ -56,7 +55,6 @@ def load_lavalink_config(filename="application.yml"):
 
 warnings.filterwarnings("ignore")
 
-ANON_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Missing_avatar.svg/2048px-Missing_avatar.svg.png"
 translation = Translation.make_translations("translations/*")
 DEFAULT_VOLUME = 100
 MAX_VOLUME = 500
