@@ -4,20 +4,13 @@ from discord.ui import Button, View, Select
 from Saturn import LANG_EMOJI_MAP, servers, get_server_translation
 
 
-FILTERS_VIEW_MESSAGE_TEXT = """Preset filters:
-- Nightcore (Pitch 1.2 & Speed 1.2)
-- Slowed    (Speed 0.8)
-- Sped up   (Speed 1.4)
-- Currently applied: {cur_applied_filters}"""
-
-
 def serve_filters_view_message(player: wavelink.Player):
-    msg = FILTERS_VIEW_MESSAGE_TEXT
+    msg = get_server_translation(player.guild, 'filters_view_message_text')
     items = player.filters.timescale.payload.items()
     if len(items) != 0:
-        applied = ", ".join(f'{n.capitalize()}: {v}' for n, v in items)
+        applied = ", ".join(f'{get_server_translation(player.guild, n)}: {v}' for n, v in items)
     else:
-        applied = "None"
+        applied = get_server_translation(player.guild, 'none')
     return msg.format(cur_applied_filters=applied)
 
 
@@ -55,31 +48,28 @@ class PlayerButtonTemplate(Button):
 
 class SkipButton(PlayerButtonTemplate):
     def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
-        super().__init__(original_view, player, "Skip", ButtonStyle.primary)
+        super().__init__(original_view, player, get_server_translation(player.guild, 'skip'), ButtonStyle.primary)
 
     async def callback(self, interaction: Interaction): await self.player.skip()
 
 
 class PlayButton(PlayerButtonTemplate):
     def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
-        super().__init__(original_view, player, "Play" if player.paused else "Pause", ButtonStyle.primary)
+        super().__init__(original_view, player, get_server_translation(player.guild, 'play') if player.paused else get_server_translation(player.guild, 'pause'), ButtonStyle.primary)
 
     async def mod_button(self):
-        self.label = "Play" if self.player.paused else "Pause"
+        self.label = get_server_translation(self.player.guild, 'play') if self.player.paused else get_server_translation(self.player.guild, 'pause')
         await self.player.pause(not self.player.paused)
 
 
 class AutoPlayButton(PlayerButtonTemplate):
     def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
         super().__init__(original_view, player,
-                         "Disable Autoplay" if player.autoplay.value else "Enable Autoplay",
+                         get_server_translation(player.guild, 'disable_autoplay') if player.autoplay.value else get_server_translation(player.guild, 'enable_autoplay'),
                          ButtonStyle.blurple)
 
     async def mod_button(self):
-        if self.player.autoplay.value:
-            self.label = "Disable Autoplay"
-        else:
-            self.label = "Enable Autoplay"
+        self.label = get_server_translation(self.player.guild, 'disable_autoplay') if self.player.autoplay.value else get_server_translation(self.player.guild, 'enable_autoplay')
         self.player.autoplay = wavelink.AutoPlayMode(value=not self.player.autoplay.value)
 
 
@@ -89,7 +79,7 @@ class StopButton(PlayerButtonTemplate):
         super().__init__(None, player, label, ButtonStyle.danger)
 
     async def callback(self, interaction: Interaction):
-        await interaction.message.delete(reason="Playback stop")
+        await interaction.message.delete(reason=get_server_translation(self.player.guild, 'playback_stopped'))
         await self.player.disconnect()
 
 
@@ -103,7 +93,7 @@ class AudioPlayerView(ViewTemplate):
     def create_all(self):
         self.all_items = [PlayButton(self, self.player),
                           SkipButton(self, self.player),
-                          StopButton(self.player, "Stop"),
+                          StopButton(self.player, get_server_translation(self.player.guild, 'stop')),
                           OpenFilterView(self.player),
                           AutoPlayButton(self, self.player)]
 
@@ -188,25 +178,25 @@ class FilterTemplate(Button):
         filters: wavelink.Filters = self.player.filters
         filters.__getattribute__(self.attr).set(**self.kwargs)
         await self.player.set_filters(filters)
-        await interaction.response.send_message(f"Applied filter ({self.label})", delete_after=1.0)
+        await interaction.response.send_message(get_server_translation(self.player.guild, 'applied_filter', name=self.label), delete_after=1.0)
 
 
 class ResetFilter(Button):
     def __init__(self, player: wavelink.Player):
         self.player = player
-        super().__init__(style=ButtonStyle.danger, label="Reset")
+        super().__init__(style=ButtonStyle.danger, label=get_server_translation(player.guild, 'reset'))
 
     async def callback(self, interaction: Interaction):
         filters: wavelink.Filters = self.player.filters
         filters.reset()
         await self.player.set_filters(filters)
-        await interaction.response.send_message(f"Reset filter(s). This may take a few seconds", delete_after=2.0)
+        await interaction.response.send_message(get_server_translation(self.player.guild, 'reset_filters'), delete_after=2.0)
 
 
 class CloseButton(Button):
     def __init__(self, player: wavelink.Player):
         self.player = player
-        super().__init__(style=ButtonStyle.danger, label="Close")
+        super().__init__(style=ButtonStyle.danger, label=get_server_translation(player.guild, 'close'))
 
     async def callback(self, interaction: Interaction):
         await self.player.filters_view_message.delete()
@@ -229,7 +219,7 @@ class FiltersView(ViewTemplate):
 class OpenFilterView(Button):
     def __init__(self, player: wavelink.Player):
         self.player = player
-        super().__init__(label="Open Filter Menu", style=ButtonStyle.green)
+        super().__init__(label=get_server_translation(player.guild, 'open_filter_menu'), style=ButtonStyle.green)
 
     async def callback(self, interaction: Interaction):
         fv = FiltersView(self.player)

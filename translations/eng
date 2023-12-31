@@ -21,3 +21,19 @@ poll_started;**$author** has started a poll
 poll_ended;**$author**s poll has ended
 total_votes;total votes
 votes;votes
+reset_filters;Reset filters. This may take a bit
+open_filter_menu;Open filter menu
+close;Close
+reset;Reset
+applied_filter;Applied filter (**$name**). This may take a bit
+stop;Stop
+playback_stopped;Playback stopped
+enable_autoplay;Enable Autoplay
+disable_autoplay;Disable Autoplay
+play;Play
+pause;Pause
+skip;Skip
+none;None
+pitch;Pitch
+speed;Speed
+filters_view_message_text;Preset filters:\n- Nightcore (Pitch 1.2 & Speed 1.2)\n- Slowed    (Speed 0.8)\n- Sped up   (Speed 1.4)\n- Currently applied: {cur_applied_filters}

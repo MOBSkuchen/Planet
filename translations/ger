@@ -21,3 +21,19 @@ poll_started;**$author** hat eine Umfrage gestartet
 poll_ended;**$author**s Umfrage ist zuende
 total_votes;insgesamte Stimmen
 votes;Stimmen
+reset_filters;Filter zurueckgesetzt. Das koennte ein bisschen dauern
+open_filter_menu;Filter Menue oeffnen
+close;Schliessen
+reset;Zuruecksetzen
+applied_filter;Filter angewendet (**$name**). Das koennte ein bisschen dauern
+stop;Stopp
+playback_stopped;Wiedergabe gestoppt
+enable_autoplay;Autoplay einschalten
+disable_autoplay;Autoplay ausschalten
+play;Fortsetzen
+pause;Pausieren
+skip;Ueberspringen
+none;Nichts
+pitch;Tonhoehe
+speed;Geschwindigkeit
+filters_view_message_text;Forgefertigte Filter:\n- Nightcore (Tonhoehe 1.2 & Geschwindigkeit 1.2)\n- Slowed    (Geschwindigkeit 0.8)\n- Sped up   (Geschwindigkeit 1.4)\n- Zurzeit angewandt: {cur_applied_filters}
