@@ -1,6 +1,5 @@
 py-cord
 # For Goblin
 numpy
-scikit-learn
 opencv-python
 wavelink==3.1.2
