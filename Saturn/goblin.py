@@ -41,7 +41,7 @@ def get_embed(player: wavelink.Player, track: wavelink.Playable, recommended):
         requester_name = requester.name
     requester_icon_url = get_icon_url(requester)
 
-    embed = Embed(color=DEFAULT_COLOR)
+    embed = Embed(color=get_color(thumbnail))
     embed.add_field(name=f"{get_server_translation(guild, 'now_playing')}{title}",
                     value=f"{get_server_translation(guild, 'by')}{author}\n{get_server_translation(guild, 'playing_for')}{time_format(milliseconds)}",
                     inline=False)
