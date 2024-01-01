@@ -69,8 +69,8 @@ class VotekickDataClass:
 
     async def _votekick(self):
         await asyncio.sleep(self.duration)
-        embed = Embed(title=f'Should {self.user.name} be kicked from the server?', colour=self.author.colour)
-        embed.set_author(name=f'{self.author.name}s vote kick against {self.author.name}',
+        embed = Embed(title=get_server_translation(self.user.guild, "vote_kick_a", user=self.user.name), colour=self.author.colour)
+        embed.set_author(name=get_server_translation(self.user.guild, "vote_kick_b", author=self.author.name, user=self.user.name),
                          icon_url=get_icon_url(self.user))
         a = 0
         m = 0
@@ -85,17 +85,16 @@ class VotekickDataClass:
                             value=f'{v} {get_server_translation(self.user.guild, "votes")}')
             a += v
         embed.title += f" [{a} {get_server_translation(self.user.guild, 'total_votes')}]"
-        value = f"The people have spoken. A majority has voted "
+        value = get_server_translation(self.user.guild, 'verdict_a')
         if not verdict:
-            value += "NOT "
-        value += f"to kick {self.user.name}."
-        if verdict:
-            value += " The decision of the people shall be carried out soon."
-        embed.add_field(name="Verdict", value=value)
+            value += get_server_translation(self.user.guild, 'verdict_n', user=self.user.name)
+        else:
+            value += get_server_translation(self.user.guild, 'verdict_y', user=self.user.name)
+        embed.add_field(name=get_server_translation(self.user.guild, 'verdict'), value=value)
         await self.original_message.channel.send(embed=embed)
         await self.original_message.delete_original_response()
         await asyncio.sleep(2)
-        await self.user.kick(reason=f"{self.author.name}s votekick [{m} voted yes]")
+        await self.user.kick(reason=get_server_translation(self.user.guild, 'verdict_reason', author=self.author.name, m=m))
 
 
 def load_lavalink_config(filename="application.yml"):
@@ -306,10 +305,10 @@ async def filter(ctx: ApplicationContext):
 
 @client.user_command(name="Start vote kick")
 async def vote_kick(ctx: ApplicationContext, member: Member):
-    embed = Embed(title=f'Should {member.name} be kicked from the server?', colour=ctx.user.colour)
-    embed.set_author(name=f'{ctx.user.name}s has started a vote kick against {ctx.user.name}',
+    embed = Embed(title=get_server_translation(ctx.guild, "vote_kick_a", user=member.name), colour=ctx.user.colour)
+    embed.set_author(name=get_server_translation(ctx.guild, "vote_kick_c", user=member.name, author=ctx.user),
                      icon_url=get_icon_url(member))
-    pv = PollView(opt := {"A": "Yes", "B": "No"})
+    pv = PollView(opt := {"A": get_server_translation(ctx.guild, "yes"), "B": get_server_translation(ctx.guild, "no")})
     org_message = await ctx.respond(embed=embed, view=pv)
     votekick = VotekickDataClass(ctx.user, member, pv.general_group, opt, DEFAULT_POLL_DURATION, org_message)
     votekick.start_votekick()

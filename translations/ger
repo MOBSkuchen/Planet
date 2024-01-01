@@ -37,3 +37,13 @@ none;Nichts
 pitch;Tonhoehe
 speed;Geschwindigkeit
 filters_view_message_text;Forgefertigte Filter:\n- Nightcore (Tonhoehe 1.2 & Geschwindigkeit 1.2)\n- Slowed    (Geschwindigkeit 0.8)\n- Sped up   (Geschwindigkeit 1.4)\n- Zurzeit angewandt: {cur_applied_filters}
+vote_kick_a;Soll $user vom Server gekickt werden?
+vote_kick_b;$authors vote kick gegen $user
+vote_kick_c;$author hat einen vote kick gegen $user gestartet
+verdict_a;Das Volk hat gesprochen und ist zu dem Urteil gekommen
+verdict_n;$user NICHT zu kicken.
+verdict_y;$user zu kicken. Die Entscheidung des Volkes wird bald durchgesetzt.
+verdict;Urteil
+verdict_reason;$authors vote kick [$m haben zugestimmt]
+yes;Ja
+no;Nein
