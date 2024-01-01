@@ -21,8 +21,9 @@ class PollDataClass:
     duration: int
     author: User
 
+    @staticmethod
     def get_winner(self):
-        return {self.options[k]: v for k, v in sorted(list(map(
+        return {k: v for k, v in sorted(list(map(
             lambda v: (v[0], len(v[1])), self.general_group.items())), key=lambda item: item[1], reverse=True)}
 
     def start_poll(self):
@@ -35,15 +36,66 @@ class PollDataClass:
     async def _poll(self):
         await asyncio.sleep(self.duration)
         embed = Embed(title=self.title, colour=self.author.colour)
-        embed.set_author(name=get_server_translation(self.original_message.guild, 'poll_ended', author=self.author.name), icon_url=get_icon_url(self.author))
+        embed.set_author(
+            name=get_server_translation(self.original_message.guild, 'poll_ended', author=self.author.name),
+            icon_url=get_icon_url(self.author))
         a = 0
-        for i, (n, v) in enumerate(self.get_winner().items()):
+        for i, (n, v) in enumerate(self.get_winner(self).items()):
+            n = self.options[n]
             if i == 0: n = f'__{n}__'
-            embed.add_field(name=f"{i+1}. {n}", value=f'{v} {get_server_translation(self.original_message.guild, "votes")}')
+            embed.add_field(name=f"{i + 1}. {n}",
+                            value=f'{v} {get_server_translation(self.original_message.guild, "votes")}')
             a += v
         embed.title += f" [{a} {get_server_translation(self.original_message.guild, 'total_votes')}]"
         await self.original_message.channel.send(embed=embed)
         await self.original_message.delete_original_response()
+
+
+@dataclass
+class VotekickDataClass:
+    author: User
+    user: Member
+    general_group: dict[str, set[int]]
+    options: dict[str, str]
+    duration: int
+    original_message: Message
+
+    def start_votekick(self):
+        proc = threading.Thread(target=self.votekick)
+        proc.start()
+
+    def votekick(self):
+        asyncio.run_coroutine_threadsafe(self._votekick(), client.loop)
+
+    async def _votekick(self):
+        await asyncio.sleep(self.duration)
+        embed = Embed(title=f'Should {self.user.name} be kicked from the server?', colour=self.author.colour)
+        embed.set_author(name=f'{self.author.name}s vote kick against {self.author.name}',
+                         icon_url=get_icon_url(self.user))
+        a = 0
+        m = 0
+        verdict = False
+        for i, (n, v) in enumerate(PollDataClass.get_winner(self).items()):
+            if i == 0:
+                verdict = n == "A"  # A = Yes; B = No
+                m = v
+            n = self.options[n]
+            if i == 0: n = f'__{n}__'
+            embed.add_field(name=f"{i + 1}. {n}",
+                            value=f'{v} {get_server_translation(self.user.guild, "votes")}')
+            a += v
+        embed.title += f" [{a} {get_server_translation(self.user.guild, 'total_votes')}]"
+        value = f"The people have spoken. A majority has voted "
+        if not verdict:
+            value += "NOT "
+        value += f"to kick {self.user.name}."
+        if verdict:
+            value += " The decision of the people shall be carried out soon."
+        embed.add_field(name="Verdict", value=value)
+        await self.original_message.channel.send(embed=embed)
+        await self.original_message.delete_original_response()
+        await asyncio.sleep(2)
+        await self.user.kick(reason=f"{self.author.name}s votekick [{m} voted yes]")
 
 
 def load_lavalink_config(filename="application.yml"):
@@ -59,6 +111,7 @@ warnings.filterwarnings("ignore")
 translation = Translation.make_translations("translations/*")
 DEFAULT_VOLUME = 100
 MAX_VOLUME = 500
+DEFAULT_POLL_DURATION = 40
 
 __version__ = "4.2"
 
@@ -134,7 +187,7 @@ async def clear(ctx: ApplicationContext, amount: int):
 @option(name="title", description="Title of the pole")
 @option(name="option1", description="First option", required=True)
 @option(name="option2", description="Second option", required=True)
-@option(name="duration", description="Poll duration (in seconds)", default=60, required=False)
+@option(name="duration", description="Poll duration (in seconds)", default=DEFAULT_POLL_DURATION, required=False)
 @option(name="option3", description="Third option", required=False)
 @option(name="option4", description="Fourth option", required=False)
 async def poll(ctx: ApplicationContext, title, option1, option2,
@@ -144,7 +197,8 @@ async def poll(ctx: ApplicationContext, title, option1, option2,
     if option4 is not None: options["D"] = option4
     pv = PollView(options)
     embed = Embed(title=title, colour=ctx.user.colour)
-    embed.set_author(name=get_server_translation(ctx.guild, 'poll_started', author=ctx.user.name), icon_url=get_icon_url(ctx.user))
+    embed.set_author(name=get_server_translation(ctx.guild, 'poll_started', author=ctx.user.name),
+                     icon_url=get_icon_url(ctx.user))
     msg = await ctx.respond(embed=embed, view=pv)
     data = PollDataClass(title, pv.general_group, options, msg, duration, ctx.user)
     data.start_poll()
@@ -248,6 +302,17 @@ async def filter(ctx: ApplicationContext):
         return
 
     player.filters_view_message = await ctx.respond(serve_filters_view_message(player), view=FiltersView(player))
+
+
+@client.user_command(name="Start vote kick")
+async def vote_kick(ctx: ApplicationContext, member: Member):
+    embed = Embed(title=f'Should {member.name} be kicked from the server?', colour=ctx.user.colour)
+    embed.set_author(name=f'{ctx.user.name}s has started a vote kick against {ctx.user.name}',
+                     icon_url=get_icon_url(member))
+    pv = PollView(opt := {"A": "Yes", "B": "No"})
+    org_message = await ctx.respond(embed=embed, view=pv)
+    votekick = VotekickDataClass(ctx.user, member, pv.general_group, opt, DEFAULT_POLL_DURATION, org_message)
+    votekick.start_votekick()
 
 
 def launch():
