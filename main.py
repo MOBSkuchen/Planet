@@ -9,7 +9,7 @@ import wavelink
 from dataclasses import dataclass
 import asyncio
 from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
-    get_embed, mention, AudioPlayerView, FiltersView, serve_filters_view_message, PollView, get_icon_url
+    get_embed, mention, AudioPlayerView, SelectFilterView, PollView, get_icon_url
 
 
 @dataclass
@@ -294,13 +294,14 @@ async def play(ctx: ApplicationContext, query: str):
 
 
 @client.slash_command(name="filter", description="Open filter menu")
-async def filter(ctx: ApplicationContext):
+@option(name="value", description="The value to set to")
+async def filter(ctx: ApplicationContext, value: float):
     player = client.get_player(ctx)
     if player is None:
         await ctx.respond(get_server_translation(ctx.guild, "only_playback"))
         return
 
-    player.filters_view_message = await ctx.respond(serve_filters_view_message(player), view=FiltersView(player))
+    await ctx.respond(view=SelectFilterView(player, value))
 
 
 @client.user_command(name="Start vote kick")

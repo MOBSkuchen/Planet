@@ -14,6 +14,12 @@ def serve_filters_view_message(player: wavelink.Player):
     return msg.format(cur_applied_filters=applied)
 
 
+async def apply_filters(player, attr="timescale", **kwargs):
+    filters: wavelink.Filters = player.filters
+    filters.__getattribute__(attr).set(**kwargs)
+    await player.set_filters(filters)
+
+
 class ViewTemplate(View):
     def rem_all(self):
         for i in self.all_items:
@@ -24,7 +30,8 @@ class ViewTemplate(View):
         for i in self.all_items:
             self.add_item(i)
 
-    def create_all(self): pass
+    def create_all(self):
+        pass
 
     def update(self):
         self.rem_all()
@@ -55,21 +62,29 @@ class SkipButton(PlayerButtonTemplate):
 
 class PlayButton(PlayerButtonTemplate):
     def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
-        super().__init__(original_view, player, get_server_translation(player.guild, 'play') if player.paused else get_server_translation(player.guild, 'pause'), ButtonStyle.primary)
+        super().__init__(original_view, player,
+                         get_server_translation(player.guild, 'play') if player.paused else get_server_translation(
+                             player.guild, 'pause'), ButtonStyle.primary)
 
     async def mod_button(self):
-        self.label = get_server_translation(self.player.guild, 'play') if self.player.paused else get_server_translation(self.player.guild, 'pause')
+        self.label = get_server_translation(self.player.guild,
+                                            'play') if self.player.paused else get_server_translation(self.player.guild,
+                                                                                                      'pause')
         await self.player.pause(not self.player.paused)
 
 
 class AutoPlayButton(PlayerButtonTemplate):
     def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
         super().__init__(original_view, player,
-                         get_server_translation(player.guild, 'disable_autoplay') if player.autoplay.value else get_server_translation(player.guild, 'enable_autoplay'),
+                         get_server_translation(player.guild,
+                                                'disable_autoplay') if player.autoplay.value else get_server_translation(
+                             player.guild, 'enable_autoplay'),
                          ButtonStyle.blurple)
 
     async def mod_button(self):
-        self.label = get_server_translation(self.player.guild, 'disable_autoplay') if self.player.autoplay.value else get_server_translation(self.player.guild, 'enable_autoplay')
+        self.label = get_server_translation(self.player.guild,
+                                            'disable_autoplay') if self.player.autoplay.value else get_server_translation(
+            self.player.guild, 'enable_autoplay')
         self.player.autoplay = wavelink.AutoPlayMode(value=not self.player.autoplay.value)
 
 
@@ -141,7 +156,7 @@ class LanguagesSettingView(View):
 
 class SettingView(View):
     def __init__(self, ctx: ApplicationContext):
-        self.ctx = ctx
+        # self.ctx = ctx
 
         class ServerManagementSelection(Select):
             def __init__(self_):
@@ -175,10 +190,9 @@ class FilterTemplate(Button):
         super().__init__(style=ButtonStyle.primary if prim else ButtonStyle.secondary, label=filter_name)
 
     async def callback(self, interaction: Interaction):
-        filters: wavelink.Filters = self.player.filters
-        filters.__getattribute__(self.attr).set(**self.kwargs)
-        await self.player.set_filters(filters)
-        await interaction.response.send_message(get_server_translation(self.player.guild, 'applied_filter', name=self.label), delete_after=1.0)
+        await apply_filters(self.player, self.attr, **self.kwargs)
+        await interaction.response.send_message(
+            get_server_translation(self.player.guild, 'applied_filter', name=self.label), delete_after=1.0)
 
 
 class ResetFilter(Button):
@@ -190,7 +204,8 @@ class ResetFilter(Button):
         filters: wavelink.Filters = self.player.filters
         filters.reset()
         await self.player.set_filters(filters)
-        await interaction.response.send_message(get_server_translation(self.player.guild, 'reset_filters'), delete_after=2.0)
+        await interaction.response.send_message(get_server_translation(self.player.guild, 'reset_filters'),
+                                                delete_after=2.0)
 
 
 class CloseButton(Button):
@@ -232,7 +247,7 @@ class PollButton(Button):
         self.name = name
         self.general_group_m = fv
         self.attach_group = attach_group
-        super().__init__(label=name,  style=ButtonStyle.primary)
+        super().__init__(label=name, style=ButtonStyle.primary)
 
     async def callback(self, interaction: Interaction):
         uid = interaction.user.id
@@ -257,3 +272,28 @@ class PollView(ViewTemplate):
             attach_group = set()
             self.general_group[i] = attach_group
             self.all_items.append(PollButton(v, self, i))
+
+
+class SelectFilter(Select):
+    def __init__(self, player: wavelink.Player, value: float):
+        self.player = player
+        self.value = value
+        super().__init__()
+
+    def add_opts(self):
+        # Descriptions are not necessary
+        # Also, I don't know an emoji to perfectly represent pitch
+        self.add_option(emoji="🤏", label="Pitch", value="pitch")
+        self.add_option(emoji="⏩", label="Speed", value="speed")
+
+    async def callback(self, interaction: Interaction):
+        await apply_filters(self.player, **{self.values[0]: self.value})
+        await interaction.response.send_message(get_server_translation(
+            self.player.guild, 'applied_filter', name=self.values[0].capitalize()), delete_after=1.0)
+        og_msg = await interaction.original_response()
+        await og_msg.delete()
+
+
+class SelectFilterView(View):
+    def __init__(self, player: wavelink.Player, value: float):
+        super().__init__(SelectFilter(player, value))
