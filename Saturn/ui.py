@@ -123,63 +123,43 @@ def _lang_opt(name: str, guid):
     return SelectOption(label=name, emoji=emoji_)
 
 
-class LanguagesSettingView(View):
-    def __init__(self, root):
-        self.root = root
-        super().__init__()
+class LanguagesSelection(Select):
+    def __init__(self_, guid):
+        self_._options = [
+            _lang_opt("English", guid),
+            _lang_opt("German", guid),
+            _lang_opt("Back", guid)
+        ]
+        super().__init__(ComponentType.string_select, placeholder="Select one language", custom_id="lang",
+                         options=self_._options)
 
-        class LanguagesSelection(Select):
-            def __init__(self_, guid):
-                self_._options = [
-                    _lang_opt("English", guid),
-                    _lang_opt("German", guid),
-                    _lang_opt("Back", guid)
-                ]
-                super().__init__(ComponentType.string_select, placeholder="Select one language", custom_id="lang",
-                                 options=self_._options)
+    async def callback(self, interaction: Interaction):
+        lang = self.values[0]
+        if " " in lang: lang = lang.split(" ")[0]  # Remove "(current)"
+        self.view.remove_item(self.view.get_item("lang"))
+        if lang == "Back": return
+        servers.set_server_setting(interaction.guild, "lang", lang)
+        await interaction.response.send_message(
+            get_server_translation(interaction.guild, "set_servers_lang", lang=lang), delete_after=5.0)
 
-            async def callback(self_, interaction: Interaction):
-                lx = self_.values[0]
-                if " " in lx:
-                    lx = lx.split(" ")[0]
-                self.remove_item(self.get_item("lang"))
-                if lx == "Back":
-                    return
-                servers.set_server_setting(interaction.guild, "lang", lx)
-                await interaction.response.send_message(
-                    get_server_translation(interaction.guild, "set_servers_lang", lang=lx), delete_after=5.0)
-
-                await self.root.ctx.delete()
-
-        self.add_item(LanguagesSelection(root.ctx.guild_id))
+        await (await interaction.original_response()).delete()
 
 
-class SettingView(View):
-    def __init__(self, ctx: ApplicationContext):
-        # self.ctx = ctx
+class ServerManagementSelection(Select):
+    def __init__(self):
+        self._options = [
+            SelectOption(label="Language", emoji="🌐",
+                         description="The Language that Planet will use for this server")
+        ]
+        self._opts2funcs = {
+            "Language": LanguagesSettingView
+        }
+        super().__init__(ComponentType.string_select,
+                         placeholder="Select one option", custom_id="sms", options=self._options)
 
-        class ServerManagementSelection(Select):
-            def __init__(self_):
-                self_._options = [
-                    SelectOption(label="Language", emoji="🌐",
-                                 description="The Language that Planet will use for this server")
-                ]
-                self_._opts2funcs = {
-                    "Language": LanguagesSettingView
-                }
-                super().__init__(ComponentType.string_select,
-                                 placeholder="Select one option", custom_id="sms", options=self_._options)
-
-            async def callback(self_, interaction: Interaction):
-                v = self_.values[0]
-                f = self_._opts2funcs[v]
-
-                await interaction.response.send_message(view=f(self))
-                og_msg = await interaction.original_response()
-                await og_msg.delete()
-
-        self.sms_S = ServerManagementSelection()
-        super().__init__(self.sms_S)
+    async def callback(self, interaction: Interaction):
+        await interaction.response.send_message(view=self._opts2funcs[self.values[0]](self))
+        await (await interaction.original_response()).delete()
 
 
 class FilterTemplate(Button):
@@ -294,6 +274,7 @@ class SelectFilter(Select):
         await og_msg.delete()
 
 
-class SelectFilterView(View):
-    def __init__(self, player: wavelink.Player, value: float):
-        super().__init__(SelectFilter(player, value))
+# IDGAF - Drake (feat. Yeat)
+SelectFilterView = lambda player, value: View(SelectFilter(player, value))
+SettingView = lambda: View(ServerManagementSelection())
+LanguagesSettingView = lambda guild_id: LanguagesSelection(guild_id)
