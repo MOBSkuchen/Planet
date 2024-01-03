@@ -222,7 +222,7 @@ class Servers(Group):
         bucket.clam("users")
 
     def init_server(self, guild_: Guild | int):
-        self.set_server_setting(guild_, "reports", 0)
+        self.set_server_setting(guild_, "report_channel_id", -1)
         self.set_server_setting(guild_, "lang", "English")
 
     def set_server_setting(self, guild_: Guild | int, key: str, value: str | int | bool):
