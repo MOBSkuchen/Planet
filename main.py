@@ -206,7 +206,7 @@ async def poll(ctx: ApplicationContext, title, option1, option2,
 @client.slash_command(name="manage", description="Manage Planet's server settings")
 async def manage(ctx: ApplicationContext):
     servers.init_and_get(ctx.guild)
-    await ctx.respond("", view=SettingView(ctx))
+    await ctx.respond("", view=SettingView())
 
 
 @client.slash_command(name="pause", description="Pauses / Resumes the playback")

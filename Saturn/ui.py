@@ -1,6 +1,6 @@
 import wavelink
-from discord import Interaction, ButtonStyle, SelectOption, ComponentType, ApplicationContext
-from discord.ui import Button, View, Select
+from discord import Interaction, ButtonStyle, SelectOption, ComponentType, Guild
+from discord.ui import Button, View, Select, Modal, InputText
 from Saturn import LANG_EMOJI_MAP, servers, get_server_translation
 
 
@@ -148,18 +148,21 @@ class LanguagesSelection(Select):
 class ServerManagementSelection(Select):
     def __init__(self):
         self._options = [
-            SelectOption(label="Language", emoji="🌐",
-                         description="The Language that Planet will use for this server")
+            SelectOption(label="Language", value="lang", emoji="🌐",
+                         description="The Language that Planet will use for this server"),
+            SelectOption(label="Report Channel", value="report_channel",
+            emoji="❗", description="Send the channel where reports should be sent in (should be a mod only channel)")
         ]
         self._opts2funcs = {
-            "Language": LanguagesSettingView
+            "lang": LanguagesSettingView,
+            "report_channel": SelectChannelView
         }
         super().__init__(ComponentType.string_select,
                          placeholder="Select one option", custom_id="sms", options=self._options)
 
     async def callback(self, interaction: Interaction):
-        await interaction.response.send_message(view=self._opts2funcs[self.values[0]](self))
-        await (await interaction.original_response()).delete()
+        await interaction.response.send_message(view=self._opts2funcs[self.values[0]](interaction.guild))
+        await self.view.message.delete()
 
 
 class FilterTemplate(Button):
@@ -270,11 +273,25 @@ class SelectFilter(Select):
         await apply_filters(self.player, **{self.values[0]: self.value})
         await interaction.response.send_message(get_server_translation(
             self.player.guild, 'applied_filter', name=self.values[0].capitalize()), delete_after=1.0)
-        og_msg = await interaction.original_response()
-        await og_msg.delete()
+        await (await interaction.original_response()).delete()
+
+
+class SelectChannel(Select):
+    def __init__(self, guild: Guild):
+        super().__init__()
+        self.guild = guild
+        self.channels = self.guild.text_channels
+        for i in self.channels:
+            self.add_option(label="#" + i.name, value=str(i.id))
+
+    async def callback(self, interaction: Interaction):
+        servers.set_server_setting(self.guild, "report_channel_id", self.values[0])
+        await interaction.response.send_message(get_server_translation(self.guild, 'done'), delete_after=1.0)
+        await self.view.message.delete()
 
 
 # IDGAF - Drake (feat. Yeat)
+SelectChannelView = lambda guild: View(SelectChannel(guild))
 SelectFilterView = lambda player, value: View(SelectFilter(player, value))
 SettingView = lambda: View(ServerManagementSelection())
-LanguagesSettingView = lambda guild_id: LanguagesSelection(guild_id)
+LanguagesSettingView = lambda guild: View(LanguagesSelection(guild.id))
