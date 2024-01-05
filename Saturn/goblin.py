@@ -9,7 +9,15 @@ music_files_bucket = get_bucket("storage/music")
 DEFAULT_COLOR = 0x000000
 
 
-def get_color(thumbnail):
+def get_color(thumbnail: str | None):
+    """
+    Gets the dominant color of an image
+    :param thumbnail:
+    Image URL (may be none)
+    :return:
+    The dominant color of the image (HEX),
+    returns DEFAULT_COLOR if <thumbnail> is None
+    """
     if thumbnail is None: return DEFAULT_COLOR
     filename = random_id() + ".jpg"
     real_filename = music_files_bucket.alloc_file(filename)
@@ -27,7 +35,18 @@ def get_color(thumbnail):
     return dominant_color
 
 
-def get_embed(player: wavelink.Player, track: wavelink.Playable, recommended):
+def get_embed(player: wavelink.Player, track: wavelink.Playable, recommended: bool):
+    """
+    Gets the embed for music playback
+    :param player:
+    The current player
+    :param track:
+    The track that is now played
+    :param recommended:
+    Whether this track was recommended by the playback API or requested by a user
+    :return:
+    Return the full embed of this track
+    """
     thumbnail = track.artwork
     title = track.title
     guild = player.guild
