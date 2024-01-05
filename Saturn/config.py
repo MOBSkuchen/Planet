@@ -3,7 +3,22 @@ import yaml
 
 
 def load(filename="config.yml"):
-    global DEBUG_GUILDS, TOKEN, STORAGE
+    """
+    Load config from a config YAML file.
+    YAML file layout:
+    # Discord token for the bot
+    token: <discord token>              [REQUIRED]
+    # A list of debug (test) guilds, new updates / changes are applied faster to these guilds
+    debug_guilds:                       [OPTIONAL]
+        - <guild id>
+        - ...
+    # Directory where storage is located (defaults to "./storage")
+    storage: <storage directory path>   [OPTIONAL]
+    :param filename:
+    Path of the config YAML file
+    :return:
+    Returns DEBUG GUILDS(:list[str]), STORAGE(:str), TOKEN(:str)
+    """
     if not os.path.exists(filename):
         raise Exception(f"Config not found ({filename})")
     with open(filename, 'r') as stream:
