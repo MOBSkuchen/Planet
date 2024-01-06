@@ -11,17 +11,6 @@ ICON_URLS = {
 }
 
 
-def mention(user_: User) -> str:
-    """
-    Concat user to discord's mentioning template
-    :param user_:
-    User to be mentioned
-    :return:
-    Mentioning template
-    """
-    return f'<@{str(user_.id)}>'
-
-
 def get_member_from_user(guild_: Guild, user_: User):
     """
     Gets a member object of a guild from a user

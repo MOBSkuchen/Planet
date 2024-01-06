@@ -9,7 +9,7 @@ import wavelink
 from dataclasses import dataclass
 import asyncio
 from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
-    get_embed, mention, AudioPlayerView, SelectFilterView, PollView, get_icon_url
+    get_embed, AudioPlayerView, SelectFilterView, PollView, get_icon_url
 
 
 @dataclass
@@ -96,6 +96,8 @@ class VotekickDataClass:
         await asyncio.sleep(2)
         await self.user.kick(reason=get_server_translation(self.user.guild, 'verdict_reason', author=self.author.name, m=m))
 
+# TODO: Prettify poll and vote kick data classes
+
 
 def load_lavalink_config(filename="application.yml"):
     with open(filename, 'r') as stream:
@@ -181,6 +183,8 @@ async def clear(ctx: ApplicationContext, amount: int):
         get_server_translation(ctx.guild, "msg_clear", amount=amount, channel=ctx.channel.name),
         delete_after=10.0)
 
+
+# TODO: Add permissions
 
 @client.slash_command(name="poll", description="Create a poll")
 @option(name="title", description="Title of the pole")
@@ -273,7 +277,7 @@ async def play(ctx: ApplicationContext, query: str):
 
     tracks: wavelink.Search = await wavelink.Playable.search(query)
     if not tracks:
-        await ctx.send(get_server_translation(ctx.guild, "track_not_found", user=mention(ctx.author)),
+        await ctx.send(get_server_translation(ctx.guild, "track_not_found", user=ctx.author.mention),
                        delete_after=10.0)
         return
 
