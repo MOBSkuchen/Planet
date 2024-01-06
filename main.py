@@ -145,7 +145,10 @@ class Planet(bridge.Bot):
             # Handle edge cases...
             return
         embed = get_embed(player, payload.track, payload.original and payload.original.recommended)
-        player.associated_message = await player.home.send(embed=embed, view=AudioPlayerView(player))
+        msg_payload = {"embed": embed}
+        if payload.track.extras["add_buttons"]:
+            msg_payload["view"] = AudioPlayerView(player)
+        player.associated_message = await player.home.send(**msg_payload)
 
     async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload) -> None:
         if payload.player is not None:
@@ -174,17 +177,13 @@ async def on_member_join(member_: Member):
 
 @client.slash_command(name="clear", description="Clears <amount> messages from current channel")
 @option("amount", description="Number of messages", min_value=1, max_value=100, required=True)
-@default_permissions(
-    manage_messages=True
-)
+@default_permissions(manage_messages=True)
 async def clear(ctx: ApplicationContext, amount: int):
     await ctx.channel.purge(limit=amount)
     await ctx.respond(
         get_server_translation(ctx.guild, "msg_clear", amount=amount, channel=ctx.channel.name),
         delete_after=10.0)
 
-
-# TODO: Add permissions
 
 @client.slash_command(name="poll", description="Create a poll")
 @option(name="title", description="Title of the pole")
@@ -255,8 +254,9 @@ async def volume(ctx: ApplicationContext, percent: int):
 
 @client.slash_command(name="play", description="Play a song!")
 @option("query", description="Search for a song", required=True)
+@option("add_buttons", description="Whether to add playback management buttons", required=False)
 @default_permissions(mute_members=True, move_members=True)
-async def play(ctx: ApplicationContext, query: str):
+async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True):
     if not ctx.guild:
         return
     track = None
@@ -288,7 +288,7 @@ async def play(ctx: ApplicationContext, query: str):
         return
 
     for track in tracks:
-        track.extras = {"requested_by": ctx.user.id, "guild": ctx.guild_id}
+        track.extras = {"requested_by": ctx.user.id, "guild": ctx.guild_id, "add_buttons": add_buttons}
 
     if isinstance(tracks, wavelink.Playlist):
         added: int = await player.queue.put_wait(tracks)
