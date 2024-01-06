@@ -76,7 +76,7 @@ def get_user(user_id: int, guild: Guild) -> User:
     return get(guild.members, id=user_id)
 
 
-def get_icon_url(requester: str) -> str:
+def get_icon_url(requester: Member) -> str:
     """
     Get the URL of a users avatar or the the logo of
     a media player
