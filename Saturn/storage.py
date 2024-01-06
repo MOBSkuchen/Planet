@@ -75,7 +75,7 @@ class Clam:
             del obj[key]
         self.dumps(obj)
 
-    def loads(self) -> str:
+    def loads(self) -> dict:
         """
         Return full dict representation of this Clam
         """
@@ -146,7 +146,7 @@ class Bucket:
         for _name in self.files_retrieve():
             self.Fopen(os.path.basename(_name))
 
-    def list_files(self) -> dic:
+    def list_files(self) -> Any:
         """
         List all allocated files
         :return:
