@@ -193,6 +193,7 @@ async def clear(ctx: ApplicationContext, amount: int):
 @option(name="duration", description="Poll duration (in seconds)", default=DEFAULT_POLL_DURATION, required=False)
 @option(name="option3", description="Third option", required=False)
 @option(name="option4", description="Fourth option", required=False)
+@default_permissions(manage_guild=True)
 async def poll(ctx: ApplicationContext, title, option1, option2,
                duration: int, option3=None, option4=None):
     options = {"A": option1, "B": option2}
@@ -208,12 +209,14 @@ async def poll(ctx: ApplicationContext, title, option1, option2,
 
 
 @client.slash_command(name="manage", description="Manage Planet's server settings")
+@default_permissions(manage_guild=True)
 async def manage(ctx: ApplicationContext):
     servers.init_and_get(ctx.guild)
     await ctx.respond("", view=SettingView())
 
 
 @client.slash_command(name="pause", description="Pauses / Resumes the playback")
+@default_permissions(mute_members=True)
 async def pause(ctx: ApplicationContext):
     player = client.get_player(ctx)
     if player is None:
@@ -225,6 +228,7 @@ async def pause(ctx: ApplicationContext):
 
 @client.slash_command(name="skip", description="Play next track in Queue")
 @option("amount", description="The amount of songs to skip", required=False)
+@default_permissions(mute_members=True)
 async def skip(ctx: ApplicationContext, amount: int = 1):
     player = client.get_player(ctx)
     if player is None:
@@ -238,6 +242,7 @@ async def skip(ctx: ApplicationContext, amount: int = 1):
 
 @client.slash_command(name="volume", description="Set playback volume")
 @option("percent", description="The audio volume percentage", min_value=0, max_value=MAX_VOLUME, required=True)
+@default_permissions(mute_members=True)
 async def volume(ctx: ApplicationContext, percent: int):
     player = client.get_player(ctx)
     if player is None:
@@ -250,6 +255,7 @@ async def volume(ctx: ApplicationContext, percent: int):
 
 @client.slash_command(name="play", description="Play a song!")
 @option("query", description="Search for a song", required=True)
+@default_permissions(mute_members=True, move_members=True)
 async def play(ctx: ApplicationContext, query: str):
     if not ctx.guild:
         return
@@ -299,6 +305,7 @@ async def play(ctx: ApplicationContext, query: str):
 
 @client.slash_command(name="filter", description="Open filter menu")
 @option(name="value", description="The value to set to")
+@default_permissions(mute_members=True)
 async def filter(ctx: ApplicationContext, value: float):
     player = client.get_player(ctx)
     if player is None:
@@ -309,6 +316,7 @@ async def filter(ctx: ApplicationContext, value: float):
 
 
 @client.user_command(name="Start vote kick")
+@default_permissions(kick_members=True)
 async def vote_kick(ctx: ApplicationContext, member: Member):
     embed = Embed(title=get_server_translation(ctx.guild, "vote_kick_a", user=member.name), colour=ctx.user.colour)
     embed.set_author(name=get_server_translation(ctx.guild, "vote_kick_c", user=member.name, author=ctx.user),
