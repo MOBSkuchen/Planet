@@ -45,11 +45,6 @@ def random_id(l=10):
     return "".join(random.choice(string.ascii_letters + string.digits) for i in range(l))
 
 
-def get_vc_from_guild(client_: Client, guild_: Guild) -> VoiceClient | None:
-    for vc in client_.voice_clients:
-        if vc.guild.id == guild_.id: return vc
-
-
 def get_user(user_id: int, guild: Guild) -> User:
     return get(guild.members, id=user_id)
 
