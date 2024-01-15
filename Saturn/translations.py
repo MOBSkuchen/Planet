@@ -30,7 +30,7 @@ class Translation:
         with open(self.filepath, 'r') as file:
             for i, c in enumerate(file.read().split("\\")):
                 if i == 0:
-                    self.lang = c.lower()[:-1]
+                    self.lang = c.lower()
                     continue
                 id_, content = c.split(";")
                 self.contents[id_.replace("\n", "")] = content

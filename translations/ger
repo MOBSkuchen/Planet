@@ -36,10 +36,10 @@ skip;Ueberspringen\
 none;Nichts\
 pitch;Tonhoehe\
 speed;Geschwindigkeit\
-filters_view_message_text;Forgefertigte Filter:\
-- Nightcore (Tonhoehe 1.2 & Geschwindigkeit 1.2)\
-- Slowed    (Geschwindigkeit 0.8)\
-- Sped up   (Geschwindigkeit 1.4)\
+filters_view_message_text;Forgefertigte Filter:
+- Nightcore (Tonhoehe 1.2 & Geschwindigkeit 1.2)
+- Slowed    (Geschwindigkeit 0.8)
+- Sped up   (Geschwindigkeit 1.4)
 - Zurzeit angewandt: {cur_applied_filters}\
 vote_kick_a;Soll $user vom Server gekickt werden?\
 vote_kick_b;$authors vote kick gegen $user\
@@ -50,4 +50,4 @@ verdict_y;$user zu kicken. Die Entscheidung des Volkes wird bald durchgesetzt.\
 verdict;Urteil\
 verdict_reason;$authors vote kick [$m haben zugestimmt]\
 yes;Ja\
-no;Nein\
+no;Nein
