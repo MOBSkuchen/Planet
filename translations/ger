@@ -1,49 +1,53 @@
-german
-now_playing;Jetzt spielt:
-by;von:
-playing_for;Spielt fuer:
-requested_by;Angefordert von:
-msg_clear;Du hast **$amount** Nachrichten aus #$channel geloescht
-current;Aktuell
-volume_set;Lautstaerke auf **$volume%** gesetzt
-added_track;**$track** zur Warteschlange hinzugefuegt
-added_playlist;Playlist $pl_name ($pl_count songs) zur Warteschlange hinzugefuegt
-pause_resume;Wiedergabe pausiert oder fortgesetzt
-track_not_found;$user - Keine songs mit dieser Suchanfrage gefunden
-play_outside_home;I kann nur in $channel spielen, weil die Wiedergabe dort gestartet wurde
-join_vc;Bitte trete zuerst einem VoiceChannel bei
-unable2join;Ich konnte diesem VoiceChannel nicht beitreten (du kannst es noch mal versuchen, aber das bringt wahrscheinlich nichts)
-skipped_songs;**$amount** song(s) übersprungen
-done;Fertig
-only_playback;Diese Aktion ist nur während der Wiedergabe erlaubt
-set_servers_lang;Server sprache zu **$lang** gesetzt
-poll_started;**$author** hat eine Umfrage gestartet
-poll_ended;**$author**s Umfrage ist zuende
-total_votes;insgesamte Stimmen
-votes;Stimmen
-reset_filters;Filter zurueckgesetzt. Das koennte ein bisschen dauern
-open_filter_menu;Filter Menue oeffnen
-close;Schliessen
-reset;Zuruecksetzen
-applied_filter;Filter angewendet (**$name**). Das koennte ein bisschen dauern
-stop;Stopp
-playback_stopped;Wiedergabe gestoppt
-enable_autoplay;Autoplay einschalten
-disable_autoplay;Autoplay ausschalten
-play;Fortsetzen
-pause;Pausieren
-skip;Ueberspringen
-none;Nichts
-pitch;Tonhoehe
-speed;Geschwindigkeit
-filters_view_message_text;Forgefertigte Filter:\n- Nightcore (Tonhoehe 1.2 & Geschwindigkeit 1.2)\n- Slowed    (Geschwindigkeit 0.8)\n- Sped up   (Geschwindigkeit 1.4)\n- Zurzeit angewandt: {cur_applied_filters}
-vote_kick_a;Soll $user vom Server gekickt werden?
-vote_kick_b;$authors vote kick gegen $user
-vote_kick_c;$author hat einen vote kick gegen $user gestartet
-verdict_a;Das Volk hat gesprochen und ist zu dem Urteil gekommen
-verdict_n;$user NICHT zu kicken.
-verdict_y;$user zu kicken. Die Entscheidung des Volkes wird bald durchgesetzt.
-verdict;Urteil
-verdict_reason;$authors vote kick [$m haben zugestimmt]
-yes;Ja
-no;Nein
+german\
+now_playing;Jetzt spielt:\
+by;von:\
+playing_for;Spielt fuer:\
+requested_by;Angefordert von:\
+msg_clear;Du hast **$amount** Nachrichten aus #$channel geloescht\
+current;Aktuell\
+volume_set;Lautstaerke auf **$volume%** gesetzt\
+added_track;**$track** zur Warteschlange hinzugefuegt\
+added_playlist;Playlist $pl_name ($pl_count songs) zur Warteschlange hinzugefuegt\
+pause_resume;Wiedergabe pausiert oder fortgesetzt\
+track_not_found;$user - Keine songs mit dieser Suchanfrage gefunden\
+play_outside_home;I kann nur in $channel spielen, weil die Wiedergabe dort gestartet wurde\
+join_vc;Bitte trete zuerst einem VoiceChannel bei\
+unable2join;Ich konnte diesem VoiceChannel nicht beitreten (du kannst es noch mal versuchen, aber das bringt wahrscheinlich nichts)\
+skipped_songs;**$amount** song(s) übersprungen\
+done;Fertig\
+only_playback;Diese Aktion ist nur während der Wiedergabe erlaubt\
+set_servers_lang;Server sprache zu **$lang** gesetzt\
+poll_started;**$author** hat eine Umfrage gestartet\
+poll_ended;**$author**s Umfrage ist zuende\
+total_votes;insgesamte Stimmen\
+votes;Stimmen\
+reset_filters;Filter zurueckgesetzt. Das koennte ein bisschen dauern\
+open_filter_menu;Filter Menue oeffnen\
+close;Schliessen\
+reset;Zuruecksetzen\
+applied_filter;Filter angewendet (**$name**). Das koennte ein bisschen dauern\
+stop;Stopp\
+playback_stopped;Wiedergabe gestoppt\
+enable_autoplay;Autoplay einschalten\
+disable_autoplay;Autoplay ausschalten\
+play;Fortsetzen\
+pause;Pausieren\
+skip;Ueberspringen\
+none;Nichts\
+pitch;Tonhoehe\
+speed;Geschwindigkeit\
+filters_view_message_text;Forgefertigte Filter:\
+- Nightcore (Tonhoehe 1.2 & Geschwindigkeit 1.2)\
+- Slowed    (Geschwindigkeit 0.8)\
+- Sped up   (Geschwindigkeit 1.4)\
+- Zurzeit angewandt: {cur_applied_filters}\
+vote_kick_a;Soll $user vom Server gekickt werden?\
+vote_kick_b;$authors vote kick gegen $user\
+vote_kick_c;$author hat einen vote kick gegen $user gestartet\
+verdict_a;Das Volk hat gesprochen und ist zu dem Urteil gekommen\
+verdict_n;$user NICHT zu kicken.\
+verdict_y;$user zu kicken. Die Entscheidung des Volkes wird bald durchgesetzt.\
+verdict;Urteil\
+verdict_reason;$authors vote kick [$m haben zugestimmt]\
+yes;Ja\
+no;Nein\

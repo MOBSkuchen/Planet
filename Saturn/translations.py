@@ -28,12 +28,12 @@ class Translation:
 
     def load(self) -> None:
         with open(self.filepath, 'r') as file:
-            for i, c in enumerate(file.readlines()):
+            for i, c in enumerate(file.read().split("\\")):
                 if i == 0:
                     self.lang = c.lower()[:-1]
                     continue
                 id_, content = c.split(";")
-                self.contents[id_] = content
+                self.contents[id_.replace("\n", "")] = content
 
     def get_translation(self, id_, **kwargs) -> str:
         c = self.contents[id_.lower()]

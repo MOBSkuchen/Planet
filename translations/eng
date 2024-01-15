@@ -1,49 +1,53 @@
-english
-now_playing;Now playing:
-by;by:
-playing_for;Playing for:
-requested_by;Requested by:
-msg_clear;You purged **$amount** messages from #$channel
-current;Current
-volume_set;Set volume to **$volume%**
-added_track;Added **$track** to the queue
-added_playlist;Added the playlist $pl_name ($pl_count songs) to the queue
-pause_resume;Paused / Resumed playback
-track_not_found;$user - Could not find any tracks for that query
-play_outside_home;Can only play in $channel, as the player has already been started there
-join_vc;Please join a voice channel first
-unable2join;I was unable to join this voice channel (you can try again but it probably won't help)
-skipped_songs;Skipped **$amount** song(s)
-done;Done
-only_playback;This action is only allowed during playback
-set_servers_lang;Set servers language to **$lang**
-poll_started;**$author** has started a poll
-poll_ended;**$author**s poll has ended
-total_votes;total votes
-votes;votes
-reset_filters;Reset filters. This may take a bit
-open_filter_menu;Open filter menu
-close;Close
-reset;Reset
-applied_filter;Applied filter (**$name**). This may take a bit
-stop;Stop
-playback_stopped;Playback stopped
-enable_autoplay;Enable Autoplay
-disable_autoplay;Disable Autoplay
-play;Play
-pause;Pause
-skip;Skip
-none;None
-pitch;Pitch
-speed;Speed
-filters_view_message_text;Preset filters:\n- Nightcore (Pitch 1.2 & Speed 1.2)\n- Slowed    (Speed 0.8)\n- Sped up   (Speed 1.4)\n- Currently applied: {cur_applied_filters}
-vote_kick_a;Should $user be kicked from the server?
-vote_kick_b;$authors vote kick against $user
-vote_kick_c;$author has started a vote kick against $user
-verdict_a;The people have spoken. A majority has voted
-verdict_n;NOT to kick $user.
-verdict_y;to kick $user. The decision of the people shall be carried out soon.
-verdict;Verdict
-verdict_reason;$authors votekick [$m voted yes]
-yes;Yes
-no;No
+english\
+now_playing;Now playing:\
+by;by:\
+playing_for;Playing for:\
+requested_by;Requested by:\
+msg_clear;You purged **$amount** messages from #$channel\
+current;Current\
+volume_set;Set volume to **$volume%**\
+added_track;Added **$track** to the queue\
+added_playlist;Added the playlist $pl_name ($pl_count songs) to the queue\
+pause_resume;Paused / Resumed playback\
+track_not_found;$user - Could not find any tracks for that query\
+play_outside_home;Can only play in $channel, as the player has already been started there\
+join_vc;Please join a voice channel first\
+unable2join;I was unable to join this voice channel (you can try again but it probably won't help)\
+skipped_songs;Skipped **$amount** song(s)\
+done;Done\
+only_playback;This action is only allowed during playback\
+set_servers_lang;Set servers language to **$lang**\
+poll_started;**$author** has started a poll\
+poll_ended;**$author**s poll has ended\
+total_votes;total votes\
+votes;votes\
+reset_filters;Reset filters. This may take a bit\
+open_filter_menu;Open filter menu\
+close;Close\
+reset;Reset\
+applied_filter;Applied filter (**$name**). This may take a bit\
+stop;Stop\
+playback_stopped;Playback stopped\
+enable_autoplay;Enable Autoplay\
+disable_autoplay;Disable Autoplay\
+play;Play\
+pause;Pause\
+skip;Skip\
+none;None\
+pitch;Pitch\
+speed;Speed\
+filters_view_message_text;Preset filters:
+- Nightcore (Pitch 1.2 & Speed 1.2)
+- Slowed    (Speed 0.8)
+- Sped up   (Speed 1.4)
+- Currently applied: {cur_applied_filters}
+vote_kick_a;Should $user be kicked from the server?\
+vote_kick_b;$authors vote kick against $user\
+vote_kick_c;$author has started a vote kick against $user\
+verdict_a;The people have spoken. A majority has voted\
+verdict_n;NOT to kick $user.\
+verdict_y;to kick $user. The decision of the people shall be carried out soon.\
+verdict;Verdict\
+verdict_reason;$authors votekick [$m voted yes]\
+yes;Yes\
+no;No\
