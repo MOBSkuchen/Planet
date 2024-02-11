@@ -144,9 +144,10 @@ class Planet(bridge.Bot):
         if not player:
             # Handle edge cases...
             return
-        embed = get_embed(player, payload.track, payload.original and payload.original.recommended)
+        recommended = payload.original and payload.original.recommended
+        embed = get_embed(player, payload.track, recommended)
         msg_payload = {"embed": embed}
-        if payload.track.extras["add_buttons"]:
+        if recommended or payload.track.extras.add_buttons:
             msg_payload["view"] = AudioPlayerView(player)
         player.associated_message = await player.home.send(**msg_payload)
 
