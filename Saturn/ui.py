@@ -1,5 +1,5 @@
 import wavelink
-from discord import Interaction, ButtonStyle, SelectOption, ComponentType, Guild
+from discord import Interaction, ButtonStyle, SelectOption, ComponentType, Guild, InputTextStyle, Message
 from discord.ui import Button, View, Select, Modal, InputText
 from Saturn import LANG_EMOJI_MAP, servers, get_server_translation
 
@@ -262,6 +262,7 @@ class SelectFilter(Select):
         self.player = player
         self.value = value
         super().__init__()
+        self.add_opts()
 
     def add_opts(self):
         # Descriptions are not necessary
@@ -271,9 +272,9 @@ class SelectFilter(Select):
 
     async def callback(self, interaction: Interaction):
         await apply_filters(self.player, **{self.values[0]: self.value})
+        await self.view.message.delete()
         await interaction.response.send_message(get_server_translation(
             self.player.guild, 'applied_filter', name=self.values[0].capitalize()), delete_after=1.0)
-        await (await interaction.original_response()).delete()
 
 
 class SelectChannel(Select):
@@ -288,6 +289,21 @@ class SelectChannel(Select):
         servers.set_server_setting(self.guild, "report_channel_id", self.values[0])
         await interaction.response.send_message(get_server_translation(self.guild, 'done'), delete_after=1.0)
         await self.view.message.delete()
+
+
+class ReportModal(Modal):
+    def __init__(self):
+        self.reason = InputText(style=InputTextStyle.multiline, required=False, placeholder="Please provide a reason for this report to give more context", label="Reason")
+        super().__init__(self.reason, title="Report this message")
+
+    async def callback(self, interaction: Interaction):
+        pass
+
+
+class ReportMessageView(View):
+    pass
+
+
 
 
 # IDGAF - Drake (feat. Yeat)
