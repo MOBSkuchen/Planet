@@ -3,10 +3,18 @@ import wavelink
 from discord import Embed
 import numpy as np
 import urllib.request
-from Saturn import get_bucket, get_server_translation, time_format, get_user, random_id, get_icon_url
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+from Saturn import get_bucket, get_server_translation, time_format, get_user, random_id, get_icon_url, SPOTIFY, SPOTIFY_ENABLED, AUDIO_SRC_PREF
 
 music_files_bucket = get_bucket("storage/music")
 DEFAULT_COLOR = 0x000000
+
+if SPOTIFY_ENABLED:
+    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=SPOTIFY["client-id"],
+                                                               client_secret=SPOTIFY["client-secret"]))
+else:
+    sp = None
 
 
 def get_color(thumbnail: str | None):
@@ -72,3 +80,21 @@ def get_embed(player: wavelink.Player, track: wavelink.Playable, recommended: bo
                      icon_url=requester_icon_url)
 
     return embed
+
+
+async def _search_ytm(query: str) -> wavelink.Search:
+    return await wavelink.Playable.search(query)
+
+async def _search_spotify(query: str):
+    track_url = sp.search(q=query, limit=1)["tracks"]["items"][0]["external_urls"]["spotify"]
+    return await wavelink.Playable.search(track_url)
+
+
+async def multi_source_search(query: str, audio_source: str):
+    audio_source = audio_source.lower()
+    if SPOTIFY_ENABLED and (audio_source == 'spotify'):
+        return await _search_spotify(query)
+    elif audio_source == 'youtube':
+        return await _search_ytm(query)
+    else:
+        return await multi_source_search(query, AUDIO_SRC_PREF)

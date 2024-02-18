@@ -9,8 +9,7 @@ import wavelink
 from dataclasses import dataclass
 import asyncio
 from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
-    get_embed, AudioPlayerView, SelectFilterView, PollView, get_icon_url
-
+    get_embed, AudioPlayerView, SelectFilterView, PollView, get_icon_url, multi_source_search
 
 @dataclass
 class PollDataClass:
@@ -115,9 +114,6 @@ MAX_VOLUME = 500
 DEFAULT_POLL_DURATION = 40
 
 __version__ = "4.2"
-
-wavelink.Player.associated_message = None
-wavelink.Player.filters_view_message = None
 
 
 class Planet(bridge.Bot):
@@ -256,8 +252,9 @@ async def volume(ctx: ApplicationContext, percent: int):
 @client.slash_command(name="play", description="Play a song!")
 @option("query", description="Search for a song", required=True)
 @option("add_buttons", description="Whether to add playback management buttons", required=False)
+@option("source", description="Audio source (either youtube or spotify)", required=False, choices=["youtube", "spotify"])
 @default_permissions(mute_members=True, move_members=True)
-async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True):
+async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True, source: str = ""):
     if not ctx.guild:
         return
     track = None
@@ -282,7 +279,7 @@ async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True):
                           delete_after=10.0)
         return
 
-    tracks: wavelink.Search = await wavelink.Playable.search(query)
+    tracks: wavelink.Search = await multi_source_search(query, source)
     if not tracks:
         await ctx.send(get_server_translation(ctx.guild, "track_not_found", user=ctx.author.mention),
                        delete_after=10.0)

@@ -14,10 +14,17 @@ def load(filename="config.yml"):
         - ...
     # Directory where storage is located (defaults to "./storage")
     storage: <storage directory path>   [OPTIONAL]
+    # Spotify credentials
+    spotify:                            [OPTIONAL]
+        enable: true
+        client-id: <spotify client id>
+        client-secret: <spotify client secret>
+    # Preferred audio source to play from
+    audio-src-pref: <spotify/youtube>   [OPTIONAL]
     :param filename:
     Path of the config YAML file
     :return:
-    Returns DEBUG GUILDS(:list[str]), STORAGE(:str), TOKEN(:str)
+    Returns DEBUG GUILDS(:list[str]), STORAGE(:str), TOKEN(:str), SPOTIFY(:dict[str, str])
     """
     if not os.path.exists(filename):
         raise Exception(f"Config not found ({filename})")
@@ -35,8 +42,17 @@ def load(filename="config.yml"):
         raise Exception(f"Token not found iny config ({filename})")
     else:
         token = cfg.get("token")
+    if (_ := cfg.get("spotify")) is not None:
+        spotify = _
+    else:
+        spotify = {"enable": False, "client-id": None, "client-secret": None}
+    if (_ := cfg.get("audio-src-pref")) is not None:
+        audio_src_pref = _
+    else:
+        audio_src_pref = "youtube"
 
-    return debug_guilds, storage, token
+    return debug_guilds, storage, token, spotify, audio_src_pref
 
 
-DEBUG_GUILDS, STORAGE, TOKEN = load()
+DEBUG_GUILDS, STORAGE, TOKEN, SPOTIFY, AUDIO_SRC_PREF = load()
+SPOTIFY_ENABLED = SPOTIFY["enable"]
