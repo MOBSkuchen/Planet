@@ -9,7 +9,7 @@ def load(filename="config.yml"):
     # Discord token for the bot
     token: <discord token>              [REQUIRED]
     # A list of debug (test) guilds, new updates / changes are applied faster to these guilds
-    :                       [OPTIONAL]
+    :debug-guilds                       [OPTIONAL]
         - <guild id>
         - ...
     # Directory where storage is located (defaults to "./storage")
@@ -30,7 +30,7 @@ def load(filename="config.yml"):
         raise Exception(f"Config not found ({filename})")
     with open(filename, 'r') as stream:
         cfg = yaml.safe_load(stream)
-    if (_ := cfg.get("")) is not None:
+    if (_ := cfg.get("debug-guilds")) is not None:
         debug_guilds = _
     else:
         debug_guilds = []
@@ -51,7 +51,7 @@ def load(filename="config.yml"):
     else:
         audio_src_pref = "youtube"
 
-    return debug_guilds, storage, token, spotify, audio_src_pref
+    return list(map(int, debug_guilds)), storage, token, spotify, audio_src_pref
 
 
 DEBUG_GUILDS, STORAGE, TOKEN, SPOTIFY, AUDIO_SRC_PREF = load()
