@@ -240,6 +240,7 @@ class PollButton(Button):
             else:
                 if uid in g:
                     g.remove(uid)
+        await interaction.response.send_message("You voted!")
 
 
 class PollView(ViewTemplate):

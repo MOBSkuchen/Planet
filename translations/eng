@@ -17,8 +17,8 @@ skipped_songs;Skipped **$amount** song(s)\
 done;Done\
 only_playback;This action is only allowed during playback\
 set_servers_lang;Set servers language to **$lang**\
-poll_started;**$author** has started a poll\
-poll_ended;**$author**s poll has ended\
+poll_started;$author has started a poll\
+poll_ended;$authors poll has ended\
 total_votes;total votes\
 votes;votes\
 reset_filters;Reset filters. This may take a bit\
