@@ -22,7 +22,7 @@ async def apply_filters(player, attr="timescale", **kwargs):
 
 class FindButton(Button):
     async def callback(self, interaction: Interaction):
-        await self.view.reported_message.reply(f"Reported message (case #{self.view.case})", delete_after=50.0)
+        await self.view.reported_message.reply(get_server_translation(interaction.guild, "found_case", case=self.view.case), delete_after=50.0)
 
 
 class DeleteMessageButton(Button):

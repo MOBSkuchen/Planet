@@ -63,6 +63,7 @@ msg_delete;Delete message\
 ban_reported_user;Banned reported user (case #$case)\
 kick_reported_user;Kicked reported user (case #$case)\
 closed_case;Closed case #$case\
+found_case;Reported message case #$case\
 deleted_msg;Deleted message (case #$case)\
 reported_msg;Reported message (case #$case)\
 ban_reason;Banned by $user because of case #$case\
