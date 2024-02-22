@@ -28,25 +28,25 @@ class FindButton(Button):
 class DeleteMessageButton(Button):
     async def callback(self, interaction: Interaction):
         await self.view.reported_message.delete()
-        await interaction.response.send_message(f"Deleted message (case #{self.view.case})", delete_after=5.0)
+        await interaction.response.send_message(get_server_translation(interaction.guild, "msg_deleted", case=self.view.case), delete_after=5.0)
 
 
 class CloseCaseButton(Button):
     async def callback(self, interaction: Interaction):
         await interaction.message.delete()
-        await interaction.response.send_message(f"Closed case #{self.view.case}", delete_after=5.0)
+        await interaction.response.send_message(get_server_translation(interaction.guild, "closed_case", case=self.view.case), delete_after=5.0)
 
 
 class KickMemberButton(Button):
     async def callback(self, interaction: Interaction):
-        await self.view.reported_message.author.kick(f"Kicked by {interaction.user} because of case #{self.view.case}")
-        await interaction.response.send_message(f"Kicked reported user (case #{self.view.case})", delete_after=15.0)
+        await self.view.reported_message.author.kick(get_server_translation(interaction.guild, "kick_reason", case=self.view.case, user=interaction.user))
+        await interaction.response.send_message(get_server_translation(interaction.guild, "kick_reported_user", case=self.view.case), delete_after=15.0)
 
 
 class BanMemberButton(Button):
     async def callback(self, interaction: Interaction):
-        await self.view.reported_message.author.ban(f"Banned by {interaction.user} because of case #{self.view.case}")
-        await interaction.response.send_message(f"Banned reported user (case #{self.view.case})", delete_after=15.0)
+        await self.view.reported_message.author.ban(get_server_translation(interaction.guild, "ban_reason", case=self.view.case, user=interaction.user))
+        await interaction.response.send_message(get_server_translation(interaction.guild, "ban_reported_user", case=self.view.case), delete_after=15.0)
 
 
 class ViewTemplate(View):
@@ -321,15 +321,6 @@ class SelectChannel(Select):
         await self.view.message.delete()
 
 
-class ReportModal(Modal):
-    def __init__(self):
-        self.reason = InputText(style=InputTextStyle.multiline, required=False, placeholder="Please provide a reason for this report to give more context", label="Reason")
-        super().__init__(self.reason, title="Report this message")
-
-    async def callback(self, interaction: Interaction):
-        pass
-
-
 class ReportMessageView(ViewTemplate):
     def __init__(self, reported_message: Message, reporter: User):
         super().__init__()
@@ -340,11 +331,11 @@ class ReportMessageView(ViewTemplate):
 
     def create_all(self):
         self.all_items = [
-            DeleteMessageButton(label="Delete message", style=ButtonStyle.primary),
-            KickMemberButton(label="Kick", style=ButtonStyle.secondary),
-            BanMemberButton(label="Ban", style=ButtonStyle.danger),
-            FindButton(label="Find", style=ButtonStyle.green),
-            CloseCaseButton(label="Close Case", style=ButtonStyle.green),
+            DeleteMessageButton(label=get_server_translation(self.reported_message.guild, 'msg_delete'), style=ButtonStyle.primary),
+            KickMemberButton(label=get_server_translation(self.reported_message.guild, 'kick'), style=ButtonStyle.secondary),
+            BanMemberButton(label=get_server_translation(self.reported_message.guild, 'ban'), style=ButtonStyle.danger),
+            FindButton(label=get_server_translation(self.reported_message.guild, 'find'), style=ButtonStyle.green),
+            CloseCaseButton(label=get_server_translation(self.reported_message.guild, 'close_case'), style=ButtonStyle.green),
         ]
 
 

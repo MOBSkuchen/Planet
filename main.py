@@ -330,14 +330,14 @@ async def vote_kick(ctx: ApplicationContext, member: Member):
 async def report(ctx: ApplicationContext, message: Message):
     channel = servers.get_server_setting(ctx.guild, "report_channel_id")
     if channel == -1:
-        await ctx.respond("Reports are not supported on this server. Contact an administrator!", delete_after=5.0)
+        await ctx.respond(get_server_translation(ctx.guild, 'reports_disabled'), delete_after=5.0)
         return
     view = ReportMessageView(message, ctx.user)
-    embed = Embed(color=0xFF0000, title=f"Report case #{view.case}", description=f'"{view.reported_message.content}" - {view.reported_message.author.name} > #{view.reported_message.channel.name}')
+    embed = Embed(color=0xFF0000, title=get_server_translation(ctx.guild, 'report_case', case=view.case), description=f'"{view.reported_message.content}" - {view.reported_message.author.name} > #{view.reported_message.channel.name}')
     embed.set_author(name=message.author, icon_url=get_icon_url(message.author))
-    embed.set_footer(text=f'Requested by {ctx.user.name}', icon_url=get_icon_url(ctx.user))
-    await (await ctx.guild.fetch_channel(channel)).send("Report submitted", view=view, embed=embed)
-    await ctx.respond("Message reported", delete_after=5.0)
+    embed.set_footer(text=get_server_translation(ctx.guild, 'requested_by', by=ctx.user.name), icon_url=get_icon_url(ctx.user))
+    await (await ctx.guild.fetch_channel(channel)).send(get_server_translation(ctx.guild, 'report_submitted'), view=view, embed=embed)
+    await ctx.respond(get_server_translation(ctx.guild, 'msg_reported'), delete_after=5.0)
 
 
 def launch():
