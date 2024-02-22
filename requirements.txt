@@ -2,4 +2,5 @@ py-cord
 # For Goblin
 numpy
 opencv-python
-wavelink==3.1.2
+wavelink
+spotipy
