@@ -1,8 +1,8 @@
 german\
-now_playing;Jetzt spielt:\
-by;von:\
-playing_for;Spielt fuer:\
-requested_by;Angefordert von:\
+now_playing;Jetzt spielt: $title\
+by;von: $by\
+playing_for;Spielt fuer: $duration\
+requested_by;Angefordert von: $by\
 msg_clear;Du hast **$amount** Nachrichten aus #$channel geloescht\
 current;Aktuell\
 volume_set;Lautstaerke auf **$volume%** gesetzt\
@@ -50,4 +50,20 @@ verdict_y;$user zu kicken. Die Entscheidung des Volkes wird bald durchgesetzt.\
 verdict;Urteil\
 verdict_reason;$authors vote kick [$m haben zugestimmt]\
 yes;Ja\
-no;Nein
+no;Nein\
+msg_reported;Nachricht gemeldet\
+report_submitted;Meldung eingereicht\
+report_case;Meldungs Fall #$case\
+reports_disabled;Meldungen werden auf diesen Server nicht unterstuetzt. Kontaktiere einen Administrator!
+kick;Kick\
+ban;Ban\
+find;Finden\
+close_case;Fall schliessen\
+msg_delete;Nachricht loeschen\
+ban_reported_user;Gemeldeten Nutzer gebannt (Fall #$case)\
+kick_reported_user;Gemeldeten Nutzer gekickt (Fall #$case)\
+closed_case;Fall geschlossen: #$case\
+deleted_msg;Nachricht geloescht (case #$case)\
+reported_msg;Nachricht gemeldet (case #$case)\
+ban_reason;Gebannt von $user, wegen Fall #$case\
+kick_reason;Gekickt von $user, wegen Fall #$case

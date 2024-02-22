@@ -1,8 +1,8 @@
 english\
-now_playing;Now playing:\
-by;by:\
-playing_for;Playing for:\
-requested_by;Requested by:\
+now_playing;Now playing: $title\
+by;by: $by\
+playing_for;Playing for: $duration\
+requested_by;Requested by: $by\
 msg_clear;You purged **$amount** messages from #$channel\
 current;Current\
 volume_set;Set volume to **$volume%**\
@@ -50,4 +50,20 @@ verdict_y;to kick $user. The decision of the people shall be carried out soon.\
 verdict;Verdict\
 verdict_reason;$authors votekick [$m voted yes]\
 yes;Yes\
-no;No
+no;No\
+msg_reported;Message Reported\
+report_submitted;Report submitted\
+report_case;Report case #$case\
+reports_disabled;Reports are not supported on this server. Contact an administrator!\
+kick;Kick\
+ban;Ban\
+find;Find\
+close_case;Close case\
+msg_delete;Delete message\
+ban_reported_user;Banned reported user (case #$case)\
+kick_reported_user;Kicked reported user (case #$case)\
+closed_case;Closed case #$case\
+deleted_msg;Deleted message (case #$case)\
+reported_msg;Reported message (case #$case)\
+ban_reason;Banned by $user because of case #$case\
+kick_reason;Kicked by $user because of case #$case
