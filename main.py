@@ -9,7 +9,8 @@ import wavelink
 from dataclasses import dataclass
 import asyncio
 from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
-    get_embed, AudioPlayerView, SelectFilterView, PollView, get_icon_url, multi_source_search
+    get_embed, AudioPlayerView, SelectFilterView, PollView, get_icon_url, multi_source_search, \
+    ReportMessageView
 
 @dataclass
 class PollDataClass:
@@ -323,6 +324,20 @@ async def vote_kick(ctx: ApplicationContext, member: Member):
     org_message = await ctx.respond(embed=embed, view=pv)
     votekick = VotekickDataClass(ctx.user, member, pv.general_group, opt, DEFAULT_POLL_DURATION, org_message)
     votekick.start_votekick()
+
+
+@client.message_command(name="Report")
+async def report(ctx: ApplicationContext, message: Message):
+    channel = servers.get_server_setting(ctx.guild, "report_channel_id")
+    if channel == -1:
+        await ctx.respond("Reports are not supported on this server. Contact an administrator!", delete_after=5.0)
+        return
+    view = ReportMessageView(message, ctx.user)
+    embed = Embed(color=0xFF0000, title=f"Report case #{view.case}", description=f'"{view.reported_message.content}" - {view.reported_message.author.name} > #{view.reported_message.channel.name}')
+    embed.set_author(name=message.author, icon_url=get_icon_url(message.author))
+    embed.set_footer(text=f'Requested by {ctx.user.name}', icon_url=get_icon_url(ctx.user))
+    await (await ctx.guild.fetch_channel(channel)).send("Report submitted", view=view, embed=embed)
+    await ctx.respond("Message reported", delete_after=5.0)
 
 
 def launch():

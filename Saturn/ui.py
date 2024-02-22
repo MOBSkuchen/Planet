@@ -1,7 +1,7 @@
 import wavelink
-from discord import Interaction, ButtonStyle, SelectOption, ComponentType, Guild, InputTextStyle, Message
+from discord import Interaction, ButtonStyle, SelectOption, ComponentType, Guild, InputTextStyle, Message, User
 from discord.ui import Button, View, Select, Modal, InputText
-from Saturn import LANG_EMOJI_MAP, servers, get_server_translation
+from Saturn import LANG_EMOJI_MAP, servers, get_server_translation, random_id
 
 
 def serve_filters_view_message(player: wavelink.Player):
@@ -18,6 +18,35 @@ async def apply_filters(player, attr="timescale", **kwargs):
     filters: wavelink.Filters = player.filters
     filters.__getattribute__(attr).set(**kwargs)
     await player.set_filters(filters)
+
+
+class FindButton(Button):
+    async def callback(self, interaction: Interaction):
+        await self.view.reported_message.reply(f"Reported message (case #{self.view.case})", delete_after=50.0)
+
+
+class DeleteMessageButton(Button):
+    async def callback(self, interaction: Interaction):
+        await self.view.reported_message.delete()
+        await interaction.response.send_message(f"Deleted message (case #{self.view.case})", delete_after=5.0)
+
+
+class CloseCaseButton(Button):
+    async def callback(self, interaction: Interaction):
+        await interaction.message.delete()
+        await interaction.response.send_message(f"Closed case #{self.view.case}", delete_after=5.0)
+
+
+class KickMemberButton(Button):
+    async def callback(self, interaction: Interaction):
+        await self.view.reported_message.author.kick(f"Kicked by {interaction.user} because of case #{self.view.case}")
+        await interaction.response.send_message(f"Kicked reported user (case #{self.view.case})", delete_after=15.0)
+
+
+class BanMemberButton(Button):
+    async def callback(self, interaction: Interaction):
+        await self.view.reported_message.author.ban(f"Banned by {interaction.user} because of case #{self.view.case}")
+        await interaction.response.send_message(f"Banned reported user (case #{self.view.case})", delete_after=15.0)
 
 
 class ViewTemplate(View):
@@ -301,10 +330,22 @@ class ReportModal(Modal):
         pass
 
 
-class ReportMessageView(View):
-    pass
+class ReportMessageView(ViewTemplate):
+    def __init__(self, reported_message: Message, reporter: User):
+        super().__init__()
+        self.reported_message = reported_message
+        self.reporter = reporter
+        self.case = random_id(10)
+        self.add_all()
 
-
+    def create_all(self):
+        self.all_items = [
+            DeleteMessageButton(label="Delete message", style=ButtonStyle.primary),
+            KickMemberButton(label="Kick", style=ButtonStyle.secondary),
+            BanMemberButton(label="Ban", style=ButtonStyle.danger),
+            FindButton(label="Find", style=ButtonStyle.green),
+            CloseCaseButton(label="Close Case", style=ButtonStyle.green),
+        ]
 
 
 # IDGAF - Drake (feat. Yeat)
