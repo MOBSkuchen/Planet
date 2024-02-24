@@ -106,7 +106,7 @@ class Bucket:
         """
         Alias for Fclose_all
         """
-        self.Fclose_all()
+        self.file_close_all()
 
     def join(self, *names) -> str:
         """
@@ -142,9 +142,9 @@ class Bucket:
         This is the same as Frefresh_all, except that it also opens
         handles for not yet registered files
         """
-        self.Fclose_all()
+        self.file_close_all()
         for _name in self.files_retrieve():
-            self.Fopen(os.path.basename(_name))
+            self.file_open(os.path.basename(_name))
 
     def list_files(self) -> Any:
         """
@@ -160,7 +160,7 @@ class Bucket:
         """
         shutil.rmtree(self.path)
 
-    def Fclose(self, name: str):
+    def file_close(self, name: str):
         """
         Close a handle
         :param name:
@@ -173,25 +173,25 @@ class Bucket:
             obj.close()
         del self.files[name]
 
-    def Fclose_all(self):
+    def file_close_all(self):
         """
         Close all handles
         """
         for name in list(self.files.keys()):
-            self.Fclose(name)
+            self.file_close(name)
 
-    def Fdel(self, name: str):
+    def file_delete(self, name: str):
         """
         Delte a file and close its handle
         :param name:
         Name of the file
         """
         name = self.join(name)
-        self.Fclose(name)
+        self.file_close(name)
         if os.path.exists(name):
             os.remove(name)
 
-    def Fopen(self, name: str):
+    def file_open(self, name: str):
         """
         Open a new handle for a file
         :param name:
@@ -199,25 +199,25 @@ class Bucket:
         """
         name = self.join(name)
         if name in self.files.keys():
-            self.Fclose(name)
+            self.file_close(name)
         self.files[name] = open(name, self.std_mode)
 
-    def Frefresh(self, name: str):
+    def file_refresh(self, name: str):
         """
         Close and reopen a handle
         :param name:
         Name of the file handle
         """
         name = self.join(name)
-        self.Fclose(name)
-        self.Fopen(name)
+        self.file_close(name)
+        self.file_open(name)
 
-    def Frefresh_all(self):
+    def file_refresh_all(self):
         """
         Close and reopen all handles
         """
         for name in self.files.keys():
-            self.Frefresh(name)
+            self.file_refresh(name)
 
     def puts(self, name: str, content: str):
         """
@@ -253,7 +253,7 @@ class Bucket:
         shutil.move(self.path, path)
         self.path = path
 
-    def Frename(self, name: str, new_name: str):
+    def file_rename(self, name: str, new_name: str):
         """
         Rename a file
         :param name:
@@ -263,10 +263,10 @@ class Bucket:
         """
         name = self.join(name)
         new_name = self.join(new_name)
-        self.Fclose(name)
+        self.file_close(name)
         shutil.copy(name, new_name)
         os.remove(name)
-        self.Fopen(new_name)
+        self.file_open(new_name)
 
     def exists(self, name: str) -> bool:
         """
@@ -289,7 +289,7 @@ class Bucket:
         Return the file handle
         """
         if not self.exists(name) and auto_open:
-            self.Fopen(name)
+            self.file_open(name)
         return self.files[name]
 
     def alloc_file(self, name: str, overwrite=False):

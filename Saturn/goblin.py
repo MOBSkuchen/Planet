@@ -39,7 +39,7 @@ def get_color(thumbnail: str | None):
     dominant_color = center[np.argmax(np.unique(labels, return_counts=True)[1])]
     dominant_color = list(dominant_color)
     dominant_color = int("0x" + '%02x%02x%02x' % tuple(int(c) for c in dominant_color), base=16)
-    music_files_bucket.Fdel(filename)
+    music_files_bucket.file_delete(filename)
     return dominant_color
 
 
