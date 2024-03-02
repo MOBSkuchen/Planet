@@ -41,7 +41,8 @@ def main():
         lavalink_proc = mp.Process(target=start_lavalink ,args=[DISABLE_LAVALINK_OUTPUT])
         launch_proc = mp.Process(target=launch)
         print("Processes ready!")
-        overwrite_lavalink()
+        if OVERWRITE_LAVALINK_APP_YML:
+            overwrite_lavalink()
         lavalink_proc.start()
         print("Lavalink started...", "[ENABLED OUTPUT]" if not DISABLE_LAVALINK_OUTPUT else "[DISABLED OUTPUT]", "[OVERWROTE LAVALINK application.yml]" if OVERWRITE_LAVALINK_APP_YML else "")
         launch_proc.start()
