@@ -114,7 +114,7 @@ DEFAULT_VOLUME = 100
 MAX_VOLUME = 500
 DEFAULT_POLL_DURATION = 40
 
-__version__ = "4.2"
+__version__ = "4.3"
 
 
 class Planet(bridge.Bot):
