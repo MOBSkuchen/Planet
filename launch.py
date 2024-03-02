@@ -9,9 +9,10 @@ OVERWRITE_LAVALINK_APP_YML = len(sys.argv) > 1 and sys.argv.pop(1).lower() in ["
 LAVALINK_FILE_CONTENT = None
 
 
-def start_lavalink():
+def start_lavalink(out):
     try:
-        proc = sbp.Popen("java -jar Lavalink.jar", shell=True, stdout=sbp.PIPE if DISABLE_LAVALINK_OUTPUT else sys.stdout)
+        out = -1 if out else sys.stdout
+        proc = sbp.Popen("java -jar Lavalink.jar", shell=True, stdout=out)
     except KeyboardInterrupt:
         proc.kill()
 
@@ -37,12 +38,12 @@ def revert_lavalink(filename="application.yml"):
 
 def main():
     try:
-        lavalink_proc = mp.Process(target=start_lavalink)
+        lavalink_proc = mp.Process(target=start_lavalink ,args=[DISABLE_LAVALINK_OUTPUT])
         launch_proc = mp.Process(target=launch)
         print("Processes ready!")
         overwrite_lavalink()
         lavalink_proc.start()
-        print("Lavalink started...", "[ENABLED INPUT]" if not DISABLE_LAVALINK_OUTPUT else "[DISABLED OUTPUT]", "[OVERWROTE LAVALINK application.yml]" if OVERWRITE_LAVALINK_APP_YML else "")
+        print("Lavalink started...", "[ENABLED OUTPUT]" if not DISABLE_LAVALINK_OUTPUT else "[DISABLED OUTPUT]", "[OVERWROTE LAVALINK application.yml]" if OVERWRITE_LAVALINK_APP_YML else "")
         launch_proc.start()
         print("Launched Planet")
         print("===============")
