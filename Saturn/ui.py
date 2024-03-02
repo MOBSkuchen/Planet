@@ -119,7 +119,6 @@ class AutoPlayButton(PlayerButtonTemplate):
 
 class StopButton(PlayerButtonTemplate):
     def __init__(self, player: wavelink.Player, label: str):
-        self.player = player
         super().__init__(None, player, label, ButtonStyle.danger)
 
     async def callback(self, interaction: Interaction):
@@ -139,7 +138,14 @@ class AudioPlayerView(ViewTemplate):
                           SkipButton(self, self.player),
                           StopButton(self.player, get_server_translation(self.player.guild, 'stop')),
                           OpenFilterView(self.player),
-                          AutoPlayButton(self, self.player)]
+                          AutoPlayButton(self, self.player),
+                          ]
+        if self.player.current.uri is not None:
+            self.all_items.append(Button(label=f'Open on {self.player.current.source.capitalize()}', style=ButtonStyle.link, url=self.player.current.uri))
+
+    async def on_timeout(self) -> None:
+        if (item := self.get_item("link")) is not None:
+            item.disabled = True
 
 
 def _lang_opt(name: str, guid):
