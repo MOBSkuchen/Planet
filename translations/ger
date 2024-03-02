@@ -54,7 +54,7 @@ no;Nein\
 msg_reported;Nachricht gemeldet\
 report_submitted;Meldung eingereicht\
 report_case;Meldungs Fall #$case\
-reports_disabled;Meldungen werden auf diesen Server nicht unterstuetzt. Kontaktiere einen Administrator!
+reports_disabled;Meldungen werden auf diesen Server nicht unterstuetzt. Kontaktiere einen Administrator!\
 kick;Kick\
 ban;Ban\
 find;Finden\
