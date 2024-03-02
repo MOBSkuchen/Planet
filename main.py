@@ -12,6 +12,7 @@ from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_s
     get_embed, AudioPlayerView, SelectFilterView, PollView, get_icon_url, multi_source_search, \
     ReportMessageView
 
+
 @dataclass
 class PollDataClass:
     title: str
@@ -69,9 +70,11 @@ class VotekickDataClass:
 
     async def _votekick(self):
         await asyncio.sleep(self.duration)
-        embed = Embed(title=get_server_translation(self.user.guild, "vote_kick_a", user=self.user.name), colour=self.author.colour)
-        embed.set_author(name=get_server_translation(self.user.guild, "vote_kick_b", author=self.author.name, user=self.user.name),
-                         icon_url=get_icon_url(self.user))
+        embed = Embed(title=get_server_translation(self.user.guild, "vote_kick_a", user=self.user.name),
+                      colour=self.author.colour)
+        embed.set_author(
+            name=get_server_translation(self.user.guild, "vote_kick_b", author=self.author.name, user=self.user.name),
+            icon_url=get_icon_url(self.user))
         a = 0
         m = 0
         verdict = False
@@ -94,7 +97,9 @@ class VotekickDataClass:
         await self.original_message.channel.send(embed=embed)
         await self.original_message.delete_original_response()
         await asyncio.sleep(2)
-        await self.user.kick(reason=get_server_translation(self.user.guild, 'verdict_reason', author=self.author.name, m=m))
+        await self.user.kick(
+            reason=get_server_translation(self.user.guild, 'verdict_reason', author=self.author.name, m=m))
+
 
 # TODO: Prettify poll and vote kick data classes
 
@@ -253,7 +258,8 @@ async def volume(ctx: ApplicationContext, percent: int):
 @client.slash_command(name="play", description="Play a song!")
 @option("query", description="Search for a song", required=True)
 @option("add_buttons", description="Whether to add playback management buttons", required=False)
-@option("source", description="Audio source (either youtube or spotify)", required=False, choices=["youtube", "spotify"])
+@option("source", description="Audio source (either youtube or spotify)", required=False,
+        choices=["youtube", "spotify"])
 @default_permissions(mute_members=True, move_members=True)
 async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True, source: str = ""):
     if not ctx.guild:
@@ -333,10 +339,13 @@ async def report(ctx: ApplicationContext, message: Message):
         await ctx.respond(get_server_translation(ctx.guild, 'reports_disabled'), delete_after=5.0)
         return
     view = ReportMessageView(message, ctx.user)
-    embed = Embed(color=0xFF0000, title=get_server_translation(ctx.guild, 'report_case', case=view.case), description=f'"{view.reported_message.content}" - {view.reported_message.author.name} > #{view.reported_message.channel.name}')
+    embed = Embed(color=0xFF0000, title=get_server_translation(ctx.guild, 'report_case', case=view.case),
+                  description=f'"{view.reported_message.content}" - {view.reported_message.author.name} > #{view.reported_message.channel.name}')
     embed.set_author(name=message.author, icon_url=get_icon_url(message.author))
-    embed.set_footer(text=get_server_translation(ctx.guild, 'requested_by', by=ctx.user.name), icon_url=get_icon_url(ctx.user))
-    await (await ctx.guild.fetch_channel(channel)).send(get_server_translation(ctx.guild, 'report_submitted'), view=view, embed=embed)
+    embed.set_footer(text=get_server_translation(ctx.guild, 'requested_by', by=ctx.user.name),
+                     icon_url=get_icon_url(ctx.user))
+    await (await ctx.guild.fetch_channel(channel)).send(get_server_translation(ctx.guild, 'report_submitted'),
+                                                        view=view, embed=embed)
     await ctx.respond(get_server_translation(ctx.guild, 'msg_reported'), delete_after=5.0)
 
 
