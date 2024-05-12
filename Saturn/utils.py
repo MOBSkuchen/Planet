@@ -106,10 +106,10 @@ def start_thread(f, *args, **kwargs):
 
 
 class TemplateDataClass:
-    def start(self):
-        return start_thread(self.execute)
+    def start(self, client):
+        return start_thread(self.execute, client)
 
-    def execute(self):
+    def execute(self, client):
         asyncio.run_coroutine_threadsafe(self._execute(), client.loop)
 
     async def _execute(self): pass

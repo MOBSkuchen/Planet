@@ -25,7 +25,7 @@ DEFAULT_VOLUME = 100
 MAX_VOLUME = 500
 DEFAULT_POLL_DURATION = 40
 
-__version__ = "4.3"
+__version__ = "4.4"
 
 
 class Planet(bridge.Bot):
@@ -115,7 +115,7 @@ async def poll(ctx: ApplicationContext, title, option1, option2,
                      icon_url=get_icon_url(ctx.user))
     msg = await ctx.respond(embed=embed, view=pv)
     data = PollDataClass(title, pv.general_group, options, msg, duration, ctx.user)
-    data.start()
+    data.start(client)
 
 
 @client.slash_command(name="manage", description="Manage Planet's server settings")
@@ -236,7 +236,7 @@ async def vote_kick(ctx: ApplicationContext, member: Member):
     pv = PollView(opt := {"A": get_server_translation(ctx.guild, "yes"), "B": get_server_translation(ctx.guild, "no")})
     org_message = await ctx.respond(embed=embed, view=pv)
     votekick = VoteKickDataClass(ctx.user, member, pv.general_group, opt, DEFAULT_POLL_DURATION, org_message)
-    votekick.start()
+    votekick.start(client)
 
 
 @client.message_command(name="Report")

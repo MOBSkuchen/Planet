@@ -38,7 +38,7 @@ def revert_lavalink(filename="application.yml"):
 
 def main():
     try:
-        lavalink_proc = mp.Process(target=start_lavalink ,args=[DISABLE_LAVALINK_OUTPUT])
+        lavalink_proc = mp.Process(target=start_lavalink, args=[DISABLE_LAVALINK_OUTPUT])
         launch_proc = mp.Process(target=launch)
         print("Processes ready!")
         if OVERWRITE_LAVALINK_APP_YML:
