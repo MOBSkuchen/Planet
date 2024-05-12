@@ -1,4 +1,3 @@
-import threading
 from discord import User, Message, Member, Intents, ApplicationContext, option, default_permissions, Embed
 from discord.ext import bridge
 from typing import cast
@@ -6,102 +5,9 @@ import warnings
 import yaml
 import discord
 import wavelink
-from dataclasses import dataclass
-import asyncio
 from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
     get_embed, AudioPlayerView, SelectFilterView, PollView, get_icon_url, multi_source_search, \
-    ReportMessageView
-
-
-@dataclass
-class PollDataClass:
-    title: str
-    general_group: dict[str, set[int]]
-    options: dict[str, str]
-    original_message: Message
-    duration: int
-    author: User
-
-    @staticmethod
-    def get_winner(self):
-        return {k: v for k, v in sorted(list(map(
-            lambda v: (v[0], len(v[1])), self.general_group.items())), key=lambda item: item[1], reverse=True)}
-
-    def start_poll(self):
-        proc = threading.Thread(target=self.poll)
-        proc.start()
-
-    def poll(self):
-        asyncio.run_coroutine_threadsafe(self._poll(), client.loop)
-
-    async def _poll(self):
-        await asyncio.sleep(self.duration)
-        embed = Embed(title=self.title, colour=self.author.colour)
-        embed.set_author(
-            name=get_server_translation(self.original_message.guild, 'poll_ended', author=self.author.name),
-            icon_url=get_icon_url(self.author))
-        a = 0
-        for i, (n, v) in enumerate(self.get_winner(self).items()):
-            n = self.options[n]
-            if i == 0: n = f'__{n}__'
-            embed.add_field(name=f"{i + 1}. {n}",
-                            value=f'{v} {get_server_translation(self.original_message.guild, "votes")}')
-            a += v
-        embed.title += f" [{a} {get_server_translation(self.original_message.guild, 'total_votes')}]"
-        await self.original_message.channel.send(embed=embed)
-        await self.original_message.delete_original_response()
-
-
-@dataclass
-class VotekickDataClass:
-    author: User
-    user: Member
-    general_group: dict[str, set[int]]
-    options: dict[str, str]
-    duration: int
-    original_message: Message
-
-    def start_votekick(self):
-        proc = threading.Thread(target=self.votekick)
-        proc.start()
-
-    def votekick(self):
-        asyncio.run_coroutine_threadsafe(self._votekick(), client.loop)
-
-    async def _votekick(self):
-        await asyncio.sleep(self.duration)
-        embed = Embed(title=get_server_translation(self.user.guild, "vote_kick_a", user=self.user.name),
-                      colour=self.author.colour)
-        embed.set_author(
-            name=get_server_translation(self.user.guild, "vote_kick_b", author=self.author.name, user=self.user.name),
-            icon_url=get_icon_url(self.user))
-        a = 0
-        m = 0
-        verdict = False
-        for i, (n, v) in enumerate(PollDataClass.get_winner(self).items()):
-            if i == 0:
-                verdict = n == "A"  # A = Yes; B = No
-                m = v
-            n = self.options[n]
-            if i == 0: n = f'__{n}__'
-            embed.add_field(name=f"{i + 1}. {n}",
-                            value=f'{v} {get_server_translation(self.user.guild, "votes")}')
-            a += v
-        embed.title += f" [{a} {get_server_translation(self.user.guild, 'total_votes')}]"
-        value = get_server_translation(self.user.guild, 'verdict_a')
-        if not verdict:
-            value += get_server_translation(self.user.guild, 'verdict_n', user=self.user.name)
-        else:
-            value += get_server_translation(self.user.guild, 'verdict_y', user=self.user.name)
-        embed.add_field(name=get_server_translation(self.user.guild, 'verdict'), value=value)
-        await self.original_message.channel.send(embed=embed)
-        await self.original_message.delete_original_response()
-        await asyncio.sleep(2)
-        await self.user.kick(
-            reason=get_server_translation(self.user.guild, 'verdict_reason', author=self.author.name, m=m))
-
-
-# TODO: Prettify poll and vote kick data classes
+    ReportMessageView, PollDataClass, VoteKickDataClass
 
 
 def load_lavalink_config(filename="application.yml"):
@@ -155,7 +61,9 @@ class Planet(bridge.Bot):
 
     async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload) -> None:
         if payload.player is not None:
-            await payload.player.associated_message.delete()
+            associated_message = getattr(payload.player, "associated_message", None)
+            if associated_message is None: return
+            associated_message.delete()
             payload.player.filters_view_message = None
             if payload.player.filters_view_message is not None:
                 await payload.player.filters_view_message.delete()
@@ -207,7 +115,7 @@ async def poll(ctx: ApplicationContext, title, option1, option2,
                      icon_url=get_icon_url(ctx.user))
     msg = await ctx.respond(embed=embed, view=pv)
     data = PollDataClass(title, pv.general_group, options, msg, duration, ctx.user)
-    data.start_poll()
+    data.start()
 
 
 @client.slash_command(name="manage", description="Manage Planet's server settings")
@@ -303,7 +211,6 @@ async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True, so
         track: wavelink.Playable = tracks[0]
         await player.queue.put_wait(track)
         await ctx.respond(get_server_translation(ctx.guild, "added_track", track=track.title), delete_after=10.0)
-
     if not player.playing:
         await player.play(player.queue.get(), volume=DEFAULT_VOLUME)
 
@@ -328,8 +235,8 @@ async def vote_kick(ctx: ApplicationContext, member: Member):
                      icon_url=get_icon_url(member))
     pv = PollView(opt := {"A": get_server_translation(ctx.guild, "yes"), "B": get_server_translation(ctx.guild, "no")})
     org_message = await ctx.respond(embed=embed, view=pv)
-    votekick = VotekickDataClass(ctx.user, member, pv.general_group, opt, DEFAULT_POLL_DURATION, org_message)
-    votekick.start_votekick()
+    votekick = VoteKickDataClass(ctx.user, member, pv.general_group, opt, DEFAULT_POLL_DURATION, org_message)
+    votekick.start()
 
 
 @client.message_command(name="Report")
