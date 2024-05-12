@@ -44,7 +44,7 @@ filters_view_message_text;Forgefertigte Filter:
 vote_kick_a;Soll $user vom Server gekickt werden?\
 vote_kick_b;$authors vote kick gegen $user\
 vote_kick_c;$author hat einen vote kick gegen $user gestartet\
-verdict_a;Das Volk hat gesprochen und ist zu dem Urteil gekommen\
+verdict_a;Das Volk hat gesprochen und ist zu dem Urteil gekommen \
 verdict_n;$user NICHT zu kicken.\
 verdict_y;$user zu kicken. Die Entscheidung des Volkes wird bald durchgesetzt.\
 verdict;Urteil\

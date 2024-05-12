@@ -44,7 +44,7 @@ filters_view_message_text;Preset filters:
 vote_kick_a;Should $user be kicked from the server?\
 vote_kick_b;$authors vote kick against $user\
 vote_kick_c;$author has started a vote kick against $user\
-verdict_a;The people have spoken. A majority has voted\
+verdict_a;The people have spoken. A majority has voted \
 verdict_n;NOT to kick $user.\
 verdict_y;to kick $user. The decision of the people shall be carried out soon.\
 verdict;Verdict\
