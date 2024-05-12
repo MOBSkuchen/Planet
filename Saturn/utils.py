@@ -1,10 +1,11 @@
 import random
 import string
 import threading
-
-from discord import Guild, User, Member
+from dataclasses import dataclass
+import asyncio
+from discord import Guild, User, Member, Embed, Message
 from discord.utils import get
-
+from Saturn import get_server_translation
 
 # Standard URL for an avatar
 ANON_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Missing_avatar.svg/2048px-Missing_avatar.svg.png"
@@ -102,3 +103,68 @@ def start_thread(f, *args, **kwargs):
     proc = threading.Thread(target=f, args=args, kwargs=kwargs)
     proc.start()
     return proc
+
+
+class TemplateDataClass:
+    def start(self):
+        return start_thread(self.execute)
+
+    def execute(self):
+        asyncio.run_coroutine_threadsafe(self._execute(), client.loop)
+
+    async def _execute(self): pass
+
+
+@dataclass
+class PollDataClass(TemplateDataClass):
+    title: str
+    general_group: dict[str, set[int]]
+    options: dict[str, str]
+    original_message: Message
+    duration: int
+    author: User
+
+    @staticmethod
+    def get_winner(self):
+        return {k: v for k, v in sorted([(v[0], len(v[1])) for v in self.general_group.items()], key=lambda item: item[1], reverse=True)}
+
+    async def _execute(self):
+        await asyncio.sleep(self.duration)
+        embed = Embed(title=self.title, colour=self.author.colour)
+        embed.set_author(name=get_server_translation(self.original_message.guild, 'poll_ended', author=self.author.name), icon_url=get_icon_url(self.author))
+        total_votes = sum(v for _, v in self.get_winner(self).items())
+        for i, (n, v) in enumerate(self.get_winner(self).items()):
+            n = self.options[n]
+            if i == 0: n = f'__{n}__'
+            embed.add_field(name=f"{i + 1}. {n}", value=f'{v} {get_server_translation(self.original_message.guild, "votes")}')
+        embed.title += f" [{total_votes} {get_server_translation(self.original_message.guild, 'total_votes')}]"
+        await self.original_message.channel.send(embed=embed)
+        await self.original_message.delete_original_response()
+
+
+@dataclass
+class VoteKickDataClass(TemplateDataClass):
+    author: User
+    user: Member
+    general_group: dict[str, set[int]]
+    options: dict[str, str]
+    duration: int
+    original_message: Message
+
+    async def _execute(self):
+        await asyncio.sleep(self.duration)
+        embed = Embed(title=get_server_translation(self.user.guild, "vote_kick_a", user=self.user.name), colour=self.author.colour)
+        embed.set_author(name=get_server_translation(self.user.guild, "vote_kick_b", author=self.author.name, user=self.user.name), icon_url=get_icon_url(self.user))
+        total_votes = sum(v for _, v in PollDataClass.get_winner(self).items())
+        for i, (n, v) in enumerate(PollDataClass.get_winner(self).items()):
+            if i == 0: verdict, m = n == "A", v
+            n = self.options[n]
+            if i == 0: n = f'__{n}__'
+            embed.add_field(name=f"{i + 1}. {n}", value=f'{v} {get_server_translation(self.user.guild, "votes")}')
+        embed.title += f" [{total_votes} {get_server_translation(self.user.guild, 'total_votes')}]"
+        value = get_server_translation(self.user.guild, 'verdict_a') + (get_server_translation(self.user.guild, 'verdict_y', user=self.user.name) if verdict else get_server_translation(self.user.guild, 'verdict_n', user=self.user.name))
+        embed.add_field(name=get_server_translation(self.user.guild, 'verdict'), value=value)
+        await self.original_message.channel.send(embed=embed)
+        await self.original_message.delete_original_response()
+        await asyncio.sleep(2)
+        await self.user.kick(reason=get_server_translation(self.user.guild, 'verdict_reason', author=self.author.name, m=m))
