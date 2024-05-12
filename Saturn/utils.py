@@ -1,5 +1,7 @@
 import random
 import string
+import threading
+
 from discord import Guild, User, Member
 from discord.utils import get
 
@@ -76,7 +78,7 @@ def get_user(user_id: int, guild: Guild) -> User:
     return get(guild.members, id=user_id)
 
 
-def get_icon_url(requester: Member) -> str:
+def get_icon_url(requester: Member | str) -> str:
     """
     Get the URL of a users avatar or the the logo of
     a media player
@@ -88,3 +90,15 @@ def get_icon_url(requester: Member) -> str:
     if isinstance(requester, Member):
         return ANON_AVATAR if not requester.avatar else requester.avatar.url
     return ICON_URLS[requester.lower()]
+
+
+def start_thread(f, *args, **kwargs):
+    """
+    Start a thread and then return it
+    :param f:
+    The function the thread runs
+    :return:
+    """
+    proc = threading.Thread(target=f, args=args, kwargs=kwargs)
+    proc.start()
+    return proc
