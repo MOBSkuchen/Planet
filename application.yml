@@ -1,11 +1,10 @@
-server: # REST and WS server
+server:
   port: 2333
   address: 127.0.0.1
 lavalink:
   plugins:
-    - dependency: "com.github.topi314.lavasrc:lavasrc-plugin:4.0.1"
-      repository: "https://maven.lavalink.dev/releases"
-      snapshot: false
+      - dependency: "dev.lavalink.youtube:youtube-plugin:1.8.3"
+        snapshot: false
   server:
     password: "youshallnotpass"
     bufferDurationMs: 400 # The duration of the NAS buffer. Higher values fare better against longer GC pauses
@@ -15,6 +14,8 @@ lavalink:
     youtubeSearchEnabled: true
     soundcloudSearchEnabled: true
     gc-warnings: true
+    sources:
+      youtube: false
 
 metrics:
   prometheus:
@@ -36,12 +37,13 @@ level:
   lavalink: INFO
 
 plugins:
-  lavasrc:
-    sources:
-      spotify: $spotify/enable                  # ref:config.yml
-    spotify:
-      clientId: $spotify/client-id              # ref:config.yml
-      clientSecret: $spotify/client-secret      # ref:config.yml
-      countryCode: "US"
-      playlistLoadLimit: 6
-      albumLoadLimit: 6
+  youtube:
+    enabled: true
+    allowSearch: true
+    allowDirectVideoIds: true
+    allowDirectPlaylistIds: true
+    clients:
+      - MUSIC
+      - ANDROID_VR
+      - WEB
+      - WEBEMBEDDED
