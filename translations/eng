@@ -36,6 +36,7 @@ skip;Skip\
 none;None\
 pitch;Pitch\
 speed;Speed\
+msg_deleted;Message deleted\
 filters_view_message_text;Preset filters:
 - Nightcore (Pitch 1.2 & Speed 1.2)
 - Slowed    (Speed 0.8)

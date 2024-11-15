@@ -36,6 +36,7 @@ skip;Ueberspringen\
 none;Nichts\
 pitch;Tonhoehe\
 speed;Geschwindigkeit\
+msg_deleted;Nachricht geloescht\
 filters_view_message_text;Forgefertigte Filter:
 - Nightcore (Tonhoehe 1.2 & Geschwindigkeit 1.2)
 - Slowed    (Geschwindigkeit 0.8)
