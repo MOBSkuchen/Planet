@@ -516,6 +516,11 @@ class Servers(Group):
         c = bucket.clam("sounds")
         return c.imports(sound_name)
 
+    def list_sounds(self, guild_: Guild | int) -> dict:
+        bucket = self.init_and_get(guild_)
+        c = bucket.clam("sounds")
+        return c.loads()
+
     def init_and_get(self, guild_: Guild | int) -> Bucket:
         """
         Get a server and init it before if it hasn't already been

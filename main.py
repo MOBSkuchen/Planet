@@ -295,11 +295,17 @@ async def sound(ctx: ApplicationContext, sound_name: str):
     source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(path))
     player.play(source, after=lambda e: ctx.respond(f"Player error: {e}") if e else None)
 
-    await ctx.respond("Playing", delete_after=10.0)
+    await ctx.respond(f"Playing {sound_name}", delete_after=10.0)
 
     while player.is_playing(): pass
 
     await player.disconnect()
+
+
+@client.slash_command(name="list_sounds")
+async def list_sounds(ctx: ApplicationContext):
+    sounds = servers.list_sounds(ctx.guild).keys()
+    await ctx.respond("\n".join(map(lambda x: f' - {x}', sounds)))
 
 
 def launch():
