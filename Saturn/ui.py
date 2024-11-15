@@ -126,6 +126,14 @@ class StopButton(PlayerButtonTemplate):
         await self.player.disconnect()
 
 
+class LyricsButton(PlayerButtonTemplate):
+    def __init__(self, player: wavelink.Player, label: str):
+        super().__init__(None, player, label, ButtonStyle.primary)
+
+    async def callback(self, interaction: Interaction):
+        await interaction.respond()
+
+
 class AudioPlayerView(ViewTemplate):
     def __init__(self, player: wavelink.Player):
         super().__init__()
@@ -345,7 +353,6 @@ class ReportMessageView(ViewTemplate):
         ]
 
 
-# IDGAF - Drake (feat. Yeat)
 SelectChannelView = lambda guild: View(SelectChannel(guild))
 SelectFilterView = lambda player, value: View(SelectFilter(player, value))
 SettingView = lambda: View(ServerManagementSelection())

@@ -458,6 +458,7 @@ class Servers(Group):
         """
         bucket.clam("settings")
         bucket.clam("users")
+        bucket.clam("sounds")
 
     def init_server(self, guild_: Guild | int):
         """
@@ -495,6 +496,25 @@ class Servers(Group):
         bucket = self.init_and_get(guild_)
         c = bucket.clam("settings")
         return c.imports(key)
+
+    def upload_server_sound(self, guild_: Guild | int, sound_name: str):
+        from Saturn import random_id
+        bucket = self.init_and_get(guild_)
+        _id = bucket.alloc_file(random_id(), True)
+        self.register_sound(guild_, sound_name, _id)
+        return _id
+
+    def register_sound(self, guild_: Guild | int, sound_name: str, sound_path: str, bucket: Bucket = None):
+        if bucket is None:
+            bucket = self.init_and_get(guild_)
+        c = bucket.clam("sounds")
+        c.exports(sound_name, sound_path)
+        return sound_name
+
+    def get_sound(self, guild_: Guild | int, sound_name: str) -> str | None:
+        bucket = self.init_and_get(guild_)
+        c = bucket.clam("sounds")
+        return c.imports(sound_name)
 
     def init_and_get(self, guild_: Guild | int) -> Bucket:
         """
