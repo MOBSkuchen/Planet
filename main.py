@@ -65,7 +65,7 @@ class Planet(bridge.Bot):
         if payload.player is not None:
             associated_message = getattr(payload.player, "associated_message", None)
             if associated_message is None: return
-            associated_message.delete()
+            await associated_message.delete()
             payload.player.filters_view_message = None
             if payload.player.filters_view_message is not None:
                 await payload.player.filters_view_message.delete()

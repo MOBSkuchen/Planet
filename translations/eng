@@ -68,4 +68,5 @@ found_case;Reported message case #$case\
 deleted_msg;Deleted message (case #$case)\
 reported_msg;Reported message (case #$case)\
 ban_reason;Banned by $user because of case #$case\
-kick_reason;Kicked by $user because of case #$case
+kick_reason;Kicked by $user because of case #$case\
+skipped_song;Song skipped

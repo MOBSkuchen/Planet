@@ -68,4 +68,5 @@ found_case;Gemeldete Nachricht aus Fall #$case\
 deleted_msg;Nachricht geloescht (case #$case)\
 reported_msg;Nachricht gemeldet (case #$case)\
 ban_reason;Gebannt von $user, wegen Fall #$case\
-kick_reason;Gekickt von $user, wegen Fall #$case
+kick_reason;Gekickt von $user, wegen Fall #$case\
+skipped_song;Song uebersprungen
