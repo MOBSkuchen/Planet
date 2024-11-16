@@ -175,8 +175,7 @@ async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True, so
     if not ctx.guild:
         return
     track = None
-    player: wavelink.Player
-    player = cast(wavelink.Player, ctx.voice_client)
+    player = client.get_player(ctx)
     if not player:
         try:
             player = await ctx.author.voice.channel.connect(cls=wavelink.Player)  # type: ignore
@@ -313,8 +312,7 @@ async def queue(ctx: ApplicationContext):
     if not ctx.guild:
         return
 
-    player: wavelink.Player
-    player = cast(wavelink.Player, ctx.voice_client)
+    player = client.get_player(ctx)
     if not player:
         await ctx.respond(get_server_translation(ctx.guild, "join_vc"), delete_after=10.0)
         return
