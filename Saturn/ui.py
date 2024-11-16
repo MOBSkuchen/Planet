@@ -106,13 +106,13 @@ class AutoPlayButton(PlayerButtonTemplate):
     def __init__(self, original_view: ViewTemplate, player: wavelink.Player):
         super().__init__(original_view, player,
                          get_server_translation(player.guild,
-                                                'disable_autoplay') if player.autoplay.value else get_server_translation(
+                                                'disable_autoplay') if not player.autoplay.value else get_server_translation(
                              player.guild, 'enable_autoplay'),
                          ButtonStyle.blurple)
 
     async def mod_button(self):
         self.label = get_server_translation(self.player.guild,
-                                            'disable_autoplay') if self.player.autoplay.value else get_server_translation(
+                                            'disable_autoplay') if not self.player.autoplay.value else get_server_translation(
             self.player.guild, 'enable_autoplay')
         self.player.autoplay = wavelink.AutoPlayMode(value=not self.player.autoplay.value)
 

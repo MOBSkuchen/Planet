@@ -9,7 +9,7 @@ import wavelink
 
 from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
     get_embed, AudioPlayerView, SelectFilterView, PollView, get_icon_url, multi_source_search, \
-    ReportMessageView, PollDataClass, VoteKickDataClass, Servers
+    ReportMessageView, PollDataClass, VoteKickDataClass, Servers, time_format
 
 
 def load_lavalink_config(filename="application.yml"):
@@ -306,6 +306,23 @@ async def sound(ctx: ApplicationContext, sound_name: str):
 async def list_sounds(ctx: ApplicationContext):
     sounds = servers.list_sounds(ctx.guild).keys()
     await ctx.respond("\n".join(map(lambda x: f' - {x}', sounds)))
+
+
+@client.slash_command(name="queue")
+async def queue(ctx: ApplicationContext):
+    if not ctx.guild:
+        return
+
+    player: wavelink.Player
+    player = cast(wavelink.Player, ctx.voice_client)
+    if not player:
+        await ctx.respond(get_server_translation(ctx.guild, "join_vc"), delete_after=10.0)
+        return
+
+    if len(player.queue) == 0:
+        await ctx.respond("Empty")
+        return
+    await ctx.respond("\n".join(map(lambda x: f'**{x.title}** - *{x.author}* ({time_format(x.length)})', player.queue)))
 
 
 def launch():
