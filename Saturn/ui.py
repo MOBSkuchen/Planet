@@ -50,6 +50,9 @@ class BanMemberButton(Button):
 
 
 class ViewTemplate(View):
+    def __init__(self, *items):
+        super().__init__(*items, timeout=None)
+
     def rem_all(self):
         for i in self.all_items:
             self.remove_item(i)
