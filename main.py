@@ -9,7 +9,7 @@ import wavelink
 
 from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
     get_embed, AudioPlayerView, SelectFilterView, PollView, get_icon_url, multi_source_search, \
-    ReportMessageView, PollDataClass, VoteKickDataClass, Servers, time_format
+    ReportMessageView, PollDataClass, VoteKickDataClass, time_format
 
 
 def load_lavalink_config(filename="application.yml"):
@@ -38,12 +38,6 @@ class Planet(bridge.Bot):
         if not wavelink.Player:
             raise Exception("Player not OK")
         print("=" * len(msg))
-
-    async def on_message(self, g_message: Message):
-        user_: User = g_message.author
-        # Ignore own messages
-        if user_.id == self.user.id:
-            return
 
     async def setup_hook(self) -> None:
         nodes = [wavelink.Node(**load_lavalink_config())]
@@ -85,6 +79,8 @@ client = Planet(intents=intents, debug_guilds=DEBUG_GUILDS)
 async def on_member_join(member_: Member):
     b = servers.add_and_init(member_.guild)
     c = b.from_member(member_)
+    if (_id := servers.get_server_setting(member_.guild, "user_channel_id")) != -1:
+        await (await member_.guild.fetch_channel(int(_id))).send(f"Hello {member_.display_name}!")
     return c
 
 
