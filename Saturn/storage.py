@@ -467,6 +467,7 @@ class Servers(Group):
         The server (guild)
         """
         self.set_server_setting(guild_, "report_channel_id", -1)
+        self.set_server_setting(guild_, "user_channel_id", -1)
         self.set_server_setting(guild_, "lang", "English")
 
     def set_server_setting(self, guild_: Guild | int, key: str, value: str | int | bool):

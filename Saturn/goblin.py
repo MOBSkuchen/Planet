@@ -93,6 +93,7 @@ async def _search_ytm(query: str) -> wavelink.Search:
     logger.log("Returning YouTube Music track")
     return await wavelink.Playable.search(query)
 
+
 async def _search_spotify(query: str):
     track_url = sp.search(q=query, limit=1)["tracks"]["items"][0]["external_urls"]["spotify"]
     playable = await wavelink.Playable.search(track_url)

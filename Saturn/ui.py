@@ -201,7 +201,8 @@ class ServerManagementSelection(Select):
         ]
         self._opts2funcs = {
             "lang": LanguagesSettingView,
-            "report_channel": SelectChannelView
+            "report_channel": SelectReportChannelView,
+            "user_channel": SelectUserChannelView
         }
         super().__init__(ComponentType.string_select,
                          placeholder="Select one option", custom_id="sms", options=self._options)
@@ -325,15 +326,16 @@ class SelectFilter(Select):
 
 
 class SelectChannel(Select):
-    def __init__(self, guild: Guild):
+    def __init__(self, guild: Guild, _slct_id: str = "report_channel_id"):
         super().__init__()
         self.guild = guild
+        self._slct_id = _slct_id
         self.channels = self.guild.text_channels
         for i in self.channels:
             self.add_option(label="#" + i.name, value=str(i.id))
 
     async def callback(self, interaction: Interaction):
-        servers.set_server_setting(self.guild, "report_channel_id", self.values[0])
+        servers.set_server_setting(self.guild, self._slct_id, self.values[0])
         await interaction.response.send_message(get_server_translation(self.guild, 'done'), delete_after=1.0)
         await self.view.message.delete()
 
@@ -356,7 +358,8 @@ class ReportMessageView(ViewTemplate):
         ]
 
 
-SelectChannelView = lambda guild: View(SelectChannel(guild))
+SelectReportChannelView = lambda guild: View(SelectChannel(guild))
+SelectUserChannelView = lambda guild: View(SelectChannel(guild, "user_channel_id"))
 SelectFilterView = lambda player, value: View(SelectFilter(player, value))
 SettingView = lambda: View(ServerManagementSelection())
 LanguagesSettingView = lambda guild: View(LanguagesSelection(guild.id))
