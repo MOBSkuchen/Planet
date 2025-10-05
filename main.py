@@ -6,7 +6,7 @@ import yaml
 import wavelink
 from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
     get_embed, AudioPlayerView, SelectFilterView, get_icon_url, multi_source_search, \
-    ReportMessageView, VoteKickDataClass, time_format, PollView
+    ReportMessageView, VoteKickDataClass, time_format, PollView, get_static_translation
 
 
 def load_lavalink_config(filename="application.yml"):
@@ -50,7 +50,7 @@ class Planet(bridge.Bot):
         msg_payload = {"embed": embed}
         if recommended or payload.track.extras.add_buttons:
             msg_payload["view"] = AudioPlayerView(player)
-        player.associated_message = await player.home.send(**msg_payload)
+        player.associated_message = await player.home.send(**msg_payload, delete_after=float(payload.track.length * 1000 + 30 if payload.track.length is not None and payload.track.length >= 0 else 10 * 60))
 
     async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload) -> None:
         if payload.player is not None:
@@ -81,7 +81,7 @@ async def on_member_join(member_: Member):
     return c
 
 
-@client.slash_command(name="clear", description="Clears <amount> messages from current channel")
+@client.slash_command(name="clear", description=get_static_translation("english", "desc_clear"), description_localizations={"en-US": get_static_translation("english", "desc_clear"), "de": get_static_translation("german", "desc_clear")})
 @option("amount", description="Number of messages", min_value=1, max_value=100, required=True)
 @default_permissions(manage_messages=True)
 async def clear(ctx: ApplicationContext, amount: int):
@@ -91,14 +91,14 @@ async def clear(ctx: ApplicationContext, amount: int):
         delete_after=10.0)
 
 
-@client.slash_command(name="manage", description="Manage Planet's server settings")
+@client.slash_command(name="manage", description=get_static_translation("english", "desc_manage"), description_localizations={"en-US": get_static_translation("english", "desc_manage"), "de": get_static_translation("german", "desc_manage")})
 @default_permissions(manage_guild=True)
 async def manage(ctx: ApplicationContext):
     servers.init_and_get(ctx.guild)
     await ctx.respond("", view=SettingView())
 
 
-@client.slash_command(name="pause", description="Pauses / Resumes the playback")
+@client.slash_command(name="pause", description=get_static_translation("english", "desc_pause"), description_localizations={"en-US": get_static_translation("english", "desc_pause"), "de": get_static_translation("german", "desc_pause")})
 @default_permissions(mute_members=True)
 async def pause(ctx: ApplicationContext):
     player = client.get_player(ctx)
@@ -109,8 +109,8 @@ async def pause(ctx: ApplicationContext):
     await ctx.respond(get_server_translation(ctx.guild, "done"), delete_after=0.1)
 
 
-@client.slash_command(name="skip", description="Play next track in Queue")
-@option("amount", description="The amount of songs to skip", required=False)
+@client.slash_command(name="skip", description=get_static_translation("english", "desc_skip"), description_localizations={"en-US": get_static_translation("english", "desc_skip"), "de": get_static_translation("german", "desc_skip")})
+@option(name="amount", description="The amount of songs to skip", required=False)
 @default_permissions(mute_members=True)
 async def skip(ctx: ApplicationContext, amount: int = 1):
     player = client.get_player(ctx)
@@ -123,7 +123,7 @@ async def skip(ctx: ApplicationContext, amount: int = 1):
     await ctx.respond(get_server_translation(ctx.guild, "skipped_song", amount=amount), delete_after=5.0)
 
 
-@client.slash_command(name="volume", description="Set playback volume")
+@client.slash_command(name="volume", description=get_static_translation("english", "desc_volume"), description_localizations={"en-US": get_static_translation("english", "desc_volume"), "de": get_static_translation("german", "desc_volume")})
 @option("percent", description="The audio volume percentage", min_value=0, max_value=MAX_VOLUME, required=True)
 @default_permissions(mute_members=True)
 async def volume(ctx: ApplicationContext, percent: int):
@@ -133,12 +133,12 @@ async def volume(ctx: ApplicationContext, percent: int):
         return
     await player.set_volume(percent)
 
-    await ctx.respond(get_server_translation(ctx.guild, "volume_set", volume=percent))
+    await ctx.respond(get_server_translation(ctx.guild, "volume_set", volume=percent), delete_after=10.0)
 
 
-@client.slash_command(name="play", description="Play a song!")
+@client.slash_command(name="play", description=get_static_translation("english", "desc_play"), description_localizations={"en-US": get_static_translation("english", "desc_play"), "de": get_static_translation("german", "desc_play")})
 @option("query", description="Search for a song", required=True)
-@option("add_buttons", description="Whether to add playback management buttons", required=False)
+@option("add_buttons", description="Whether to add playback management buttons", default=False, required=False)
 @option("source", description="Audio source (either youtube or spotify)", required=False,
         choices=["youtube", "spotify"])
 @default_permissions(mute_members=True, move_members=True)
@@ -187,7 +187,7 @@ async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True, so
         await player.play(player.queue.get(), volume=DEFAULT_VOLUME)
 
 
-@client.slash_command(name="filter", description="Open filter menu")
+@client.slash_command(name="filter", description=get_static_translation("english", "desc_filter"), description_localizations={"en-US": get_static_translation("english", "desc_filter"), "de": get_static_translation("german", "desc_filter")})
 @option(name="value", description="The value to set to")
 @default_permissions(mute_members=True)
 async def filter(ctx: ApplicationContext, value: float):
@@ -196,10 +196,10 @@ async def filter(ctx: ApplicationContext, value: float):
         await ctx.respond(get_server_translation(ctx.guild, "only_playback"))
         return
 
-    await ctx.respond(view=SelectFilterView(player, value))
+    await ctx.respond(view=SelectFilterView(player, value), delete_after=120.0)
 
 
-@client.user_command(name="Start vote kick")
+@client.user_command(name=get_static_translation("english", "name_votekick"), name_localizations={"en-US": get_static_translation("english", "name_votekick"), "de": get_static_translation("german", "name_votekick")})
 @default_permissions(kick_members=True)
 async def vote_kick(ctx: ApplicationContext, member: Member):
     embed = Embed(title=get_server_translation(ctx.guild, "vote_kick_a", user=member.name), colour=ctx.user.colour)
@@ -211,7 +211,7 @@ async def vote_kick(ctx: ApplicationContext, member: Member):
     votekick.start(client)
 
 
-@client.message_command(name="Report")
+@client.message_command(name="Report", name_localizations={"en-US": get_static_translation("english", "name_report"), "de": get_static_translation("german", "name_report")})
 async def report(ctx: ApplicationContext, message: Message):
     channel = servers.get_server_setting(ctx.guild, "report_channel_id")
     if channel == -1:
@@ -225,10 +225,10 @@ async def report(ctx: ApplicationContext, message: Message):
                      icon_url=get_icon_url(ctx.user))
     await (await ctx.guild.fetch_channel(channel)).send(get_server_translation(ctx.guild, 'report_submitted'),
                                                         view=view, embed=embed)
-    await ctx.respond(get_server_translation(ctx.guild, 'msg_reported'), delete_after=5.0)
+    await ctx.respond(get_server_translation(ctx.guild, 'msg_reported'), delete_after=10.0)
 
 
-@client.slash_command(name="queue")
+@client.slash_command(name="queue", description=get_static_translation("english", "desc_queue"), description_localizations={"en-US": get_static_translation("english", "desc_queue"), "de": get_static_translation("german", "desc_queue")})
 async def queue(ctx: ApplicationContext):
     if not ctx.guild:
         return
@@ -241,7 +241,7 @@ async def queue(ctx: ApplicationContext):
     if len(player.queue) == 0:
         await ctx.respond("Empty")
         return
-    await ctx.respond("\n".join(map(lambda x: f'**{x.title}** - *{x.author}* ({time_format(x.length)})', player.queue)))
+    await ctx.respond("\n".join(map(lambda x: f'**{x.title}** - *{x.author}* ({time_format(x.length)})', player.queue)), delete_after=30.0)
 
 
 def launch():

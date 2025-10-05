@@ -53,3 +53,6 @@ class Translation:
 def get_server_translation(guild: Guild | int, id_, **kwargs):
     lang = servers.get_server_setting(guild, "lang")
     return translations[lang.lower()].get_translation(id_, **kwargs)
+
+def get_static_translation(lang, id_, **kwargs):
+    return translations[lang.lower()].get_translation(id_, **kwargs)

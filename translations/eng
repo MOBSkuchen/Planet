@@ -65,4 +65,15 @@ deleted_msg;Deleted message (case #$case)\
 reported_msg;Reported message (case #$case)\
 ban_reason;Banned by $user because of case #$case\
 kick_reason;Kicked by $user because of case #$case\
-skipped_song;Song skipped
+skipped_song;Song skipped\
+desc_queue;Displays songs in queue\
+name_report;Melden\
+name_votekick;Vote kick\
+desc_filter;Apply filters to playback\
+desc_play;Play a song\
+desc_clear;Clear one or more messages from the current channel\
+desc_volume;Change the playback volume (0-500)\
+desc_skip;Skip one or more songs\
+desc_pause;Pause the currently playing song\
+desc_manage;Manage Planet-settings for this server\
+start_vote_kick;Start a vote kick

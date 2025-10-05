@@ -1,6 +1,6 @@
 import wavelink
-from discord import Interaction, ButtonStyle, SelectOption, ComponentType, Guild, InputTextStyle, Message, User
-from discord.ui import Button, View, Select, Modal, InputText
+from discord import Interaction, ButtonStyle, SelectOption, ComponentType, Guild, Message, User
+from discord.ui import Button, View, Select
 from Saturn import LANG_EMOJI_MAP, servers, get_server_translation, random_id
 
 
