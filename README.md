@@ -1,5 +1,6 @@
 # Planet - All purpose discord bot
 Welcome to the all-purpose Discord bot built with Python using [pycord](https://github.com/Pycord-Development/pycord)! This versatile bot is designed to enhance your Discord server experience by providing a range of functionalities and features. It is useful for server moderators, admins and all other members.
+
 ## Installation
 1. Install Python (>= 1.11)
 2. Install Java to use Playback features
@@ -34,9 +35,7 @@ Welcome to the all-purpose Discord bot built with Python using [pycord](https://
   - Set the channel where reports land
     - Dropdown list of available channels
 - Clear a certain amount of messages from a channel
-- Create a poll
-  - Features a button UI
-  - A user can only vote once and then change his vote, but not vote for two different things at the same time
+- Vote kick members
 - Report messages
   - Control panel (featuring buttons) to choose actions on the report
   - Report using a message command
@@ -47,9 +46,10 @@ Welcome to the all-purpose Discord bot built with Python using [pycord](https://
   - Debug guilds
   - Storage location
   - Lavalink settings
+  - Playback settings
 - Launcher
   - Start bot and lavalink server together
-  - Update application.yml using config
+  - Centralized config
 - Saturn library
   - Goblin music manager
   - Storage API
