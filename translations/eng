@@ -66,14 +66,26 @@ reported_msg;Reported message (case #$case)\
 ban_reason;Banned by $user because of case #$case\
 kick_reason;Kicked by $user because of case #$case\
 skipped_song;Song skipped\
-desc_queue;Displays songs in queue\
-name_report;Melden\
-name_votekick;Vote kick\
-desc_filter;Apply filters to playback\
+desc_queue;Shows the songs in the queue\
+name_report;Report\
+name_votekick;Vote Kick\
+desc_filter;Apply a filter to the playback\
 desc_play;Play a song\
-desc_clear;Clear one or more messages from the current channel\
-desc_volume;Change the playback volume (0-500)\
-desc_skip;Skip one or more songs\
-desc_pause;Pause the currently playing song\
-desc_manage;Manage Planet-settings for this server\
-start_vote_kick;Start a vote kick
+desc_clear;Deletes one or more messages from the channel\
+desc_volume;Change the volume (0-500)\
+desc_skip;Skips one or more songs\
+desc_pause;Pauses or resumes the playback\
+desc_manage;Manage Planet settings for this server\
+start_vote_kick;Start a vote kick\
+name_opt_amount;amount\
+desc_opt_amount;The amount of items to action\
+name_opt_percent;percent\
+desc_opt_percent;The audio volume percentage\
+name_opt_query;query\
+desc_opt_query;Search for a song\
+name_opt_add_buttons;add_buttons\
+desc_opt_add_buttons;Whether to add playback management buttons\
+name_opt_source;source\
+desc_opt_source;Audio source (either youtube or spotify)\
+name_opt_value;value\
+desc_opt_value;The value to set for the filter

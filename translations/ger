@@ -66,14 +66,26 @@ reported_msg;Nachricht gemeldet (case #$case)\
 ban_reason;Gebannt von $user, wegen Fall #$case\
 kick_reason;Gekickt von $user, wegen Fall #$case\
 skipped_song;Song uebersprungen\
-desc_queue;Zeigt die Songs in der Warteschleife\
-name_report;Report\
-name_votekick;Vote-Kick\
-desc_filter;Wende Filter auf die Wiedergabe an\
+desc_queue;Zeigt die Songs in der Warteschlange\
+name_report;Melden\
+name_votekick;Abstimmung zum Rauswurf\
+desc_filter;Wende einen Filter auf die Wiedergabe an\
 desc_play;Spiele einen Song\
-desc_clear;Loesche eine, oder mehrere Nachrichten vom Kanal\
+desc_clear;Lösche eine oder mehrere Nachrichten aus dem Kanal\
 desc_volume;Ändere die Lautstärke (0-500)\
-desc_skip;Überspringe eine oder mehrere Songs\
-desc_pause;Pausiere die Wiedergabe\
-desc_manage;Setze Planet-Einstellungen für diesen Server\
-start_vote_kick;Start a vote kick
+desc_skip;Überspringe einen oder mehrere Songs\
+desc_pause;Pausiert oder fortsesetzt die Wiedergabe\
+desc_manage;Verwalte die Planet-Einstellungen für diesen Server\
+start_vote_kick;Starte eine Abstimmung zum Rauswurf\
+name_opt_amount;anzahl\
+desc_opt_amount;Die Anzahl der Elemente\
+name_opt_percent;prozent\
+desc_opt_percent;Die Lautstärke in Prozent\
+name_opt_query;suche\
+desc_opt_query;Suche nach einem Lied\
+name_opt_add_buttons;buttons_hinzufügen\
+desc_opt_add_buttons;Ob Wiedergabesteuerungs-Buttons hinzugefügt werden sollen\
+name_opt_source;quelle\
+desc_opt_source;Audioquelle (entweder YouTube oder Spotify)\
+name_opt_value;wert\
+desc_opt_value;Der Wert, der für den Filter gesetzt werden soll

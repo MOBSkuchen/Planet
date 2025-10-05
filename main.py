@@ -82,7 +82,10 @@ async def on_member_join(member_: Member):
 
 
 @client.slash_command(name="clear", description=get_static_translation("english", "desc_clear"), description_localizations={"en-US": get_static_translation("english", "desc_clear"), "de": get_static_translation("german", "desc_clear")})
-@option("amount", description="Number of messages", min_value=1, max_value=100, required=True)
+@option("amount", description=get_static_translation("english", "desc_opt_amount"),
+        name_localizations={"en-US": get_static_translation("english", "name_opt_amount"), "de": get_static_translation("german", "name_opt_amount")},
+        description_localizations={"en-US": get_static_translation("english", "desc_opt_amount"), "de": get_static_translation("german", "desc_opt_amount")},
+        min_value=1, max_value=100, required=True)
 @default_permissions(manage_messages=True)
 async def clear(ctx: ApplicationContext, amount: int):
     await ctx.channel.purge(limit=amount)
@@ -110,7 +113,10 @@ async def pause(ctx: ApplicationContext):
 
 
 @client.slash_command(name="skip", description=get_static_translation("english", "desc_skip"), description_localizations={"en-US": get_static_translation("english", "desc_skip"), "de": get_static_translation("german", "desc_skip")})
-@option(name="amount", description="The amount of songs to skip", required=False)
+@option(name="amount", description=get_static_translation("english", "desc_opt_amount"),
+        name_localizations={"en-US": get_static_translation("english", "name_opt_amount"), "de": get_static_translation("german", "name_opt_amount")},
+        description_localizations={"en-US": get_static_translation("english", "desc_opt_amount"), "de": get_static_translation("german", "desc_opt_amount")},
+        required=False)
 @default_permissions(mute_members=True)
 async def skip(ctx: ApplicationContext, amount: int = 1):
     player = client.get_player(ctx)
@@ -124,7 +130,10 @@ async def skip(ctx: ApplicationContext, amount: int = 1):
 
 
 @client.slash_command(name="volume", description=get_static_translation("english", "desc_volume"), description_localizations={"en-US": get_static_translation("english", "desc_volume"), "de": get_static_translation("german", "desc_volume")})
-@option("percent", description="The audio volume percentage", min_value=0, max_value=MAX_VOLUME, required=True)
+@option("percent", description=get_static_translation("english", "desc_opt_percent"),
+        name_localizations={"en-US": get_static_translation("english", "name_opt_percent"), "de": get_static_translation("german", "name_opt_percent")},
+        description_localizations={"en-US": get_static_translation("english", "desc_opt_percent"), "de": get_static_translation("german", "desc_opt_percent")},
+        min_value=0, max_value=MAX_VOLUME, required=True)
 @default_permissions(mute_members=True)
 async def volume(ctx: ApplicationContext, percent: int):
     player = client.get_player(ctx)
@@ -137,9 +146,18 @@ async def volume(ctx: ApplicationContext, percent: int):
 
 
 @client.slash_command(name="play", description=get_static_translation("english", "desc_play"), description_localizations={"en-US": get_static_translation("english", "desc_play"), "de": get_static_translation("german", "desc_play")})
-@option("query", description="Search for a song", required=True)
-@option("add_buttons", description="Whether to add playback management buttons", default=False, required=False)
-@option("source", description="Audio source (either youtube or spotify)", required=False,
+@option("query", description=get_static_translation("english", "desc_opt_query"),
+        name_localizations={"en-US": get_static_translation("english", "name_opt_query"), "de": get_static_translation("german", "name_opt_query")},
+        description_localizations={"en-US": get_static_translation("english", "desc_opt_query"), "de": get_static_translation("german", "desc_opt_query")},
+        required=True)
+@option("add_buttons", description=get_static_translation("english", "desc_opt_add_buttons"),
+        name_localizations={"en-US": get_static_translation("english", "name_opt_add_buttons"), "de": get_static_translation("german", "name_opt_add_buttons")},
+        description_localizations={"en-US": get_static_translation("english", "desc_opt_add_buttons"), "de": get_static_translation("german", "desc_opt_add_buttons")},
+        default=False, required=False)
+@option("source", description=get_static_translation("english", "desc_opt_source"),
+        name_localizations={"en-US": get_static_translation("english", "name_opt_source"), "de": get_static_translation("german", "name_opt_source")},
+        description_localizations={"en-US": get_static_translation("english", "desc_opt_source"), "de": get_static_translation("german", "desc_opt_source")},
+        required=False,
         choices=["youtube", "spotify"])
 @default_permissions(mute_members=True, move_members=True)
 async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True, source: str = ""):
@@ -188,7 +206,9 @@ async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True, so
 
 
 @client.slash_command(name="filter", description=get_static_translation("english", "desc_filter"), description_localizations={"en-US": get_static_translation("english", "desc_filter"), "de": get_static_translation("german", "desc_filter")})
-@option(name="value", description="The value to set to")
+@option(name="value", description=get_static_translation("english", "desc_opt_value"),
+        name_localizations={"en-US": get_static_translation("english", "name_opt_value"), "de": get_static_translation("german", "name_opt_value")},
+        description_localizations={"en-US": get_static_translation("english", "desc_opt_value"), "de": get_static_translation("german", "desc_opt_value")})
 @default_permissions(mute_members=True)
 async def filter(ctx: ApplicationContext, value: float):
     player = client.get_player(ctx)
