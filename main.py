@@ -255,7 +255,7 @@ async def queue(ctx: ApplicationContext):
 
     player = client.get_player(ctx)
     if not player:
-        await ctx.respond(get_server_translation(ctx.guild, "join_vc"), delete_after=10.0)
+        await ctx.respond(get_server_translation(ctx.guild, "only_playback"), delete_after=10.0)
         return
 
     if len(player.queue) == 0:
