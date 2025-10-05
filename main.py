@@ -77,7 +77,7 @@ async def on_member_join(member_: Member):
     b = servers.add_and_init(member_.guild)
     c = b.from_member(member_)
     if (_id := servers.get_server_setting(member_.guild, "user_channel_id")) != -1:
-        await (await member_.guild.fetch_channel(int(_id))).send(f"Hello {member_.display_name}!")
+        await (await member_.guild.fetch_channel(int(_id))).send(f"Hi {member_.display_name}!")
     return c
 
 
