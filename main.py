@@ -1,15 +1,12 @@
-from discord import User, Message, Member, Intents, ApplicationContext, option, default_permissions, Embed, VoiceClient, \
-    PCMAudio
+from discord import Message, Member, Intents, ApplicationContext, option, default_permissions, Embed, ClientException
 from discord.ext import bridge
 from typing import cast
 import warnings
 import yaml
-import discord
 import wavelink
-
 from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
-    get_embed, AudioPlayerView, SelectFilterView, PollView, get_icon_url, multi_source_search, \
-    ReportMessageView, PollDataClass, VoteKickDataClass, time_format
+    get_embed, AudioPlayerView, SelectFilterView, get_icon_url, multi_source_search, \
+    ReportMessageView, VoteKickDataClass, time_format, PollView
 
 
 def load_lavalink_config(filename="application.yml"):
@@ -27,7 +24,7 @@ DEFAULT_VOLUME = 100
 MAX_VOLUME = 500
 DEFAULT_POLL_DURATION = 40
 
-__version__ = "4.4"
+__version__ = "4.5"
 
 
 class Planet(bridge.Bot):
@@ -71,7 +68,7 @@ class Planet(bridge.Bot):
         return player
 
 
-intents: discord.flags.Intents = Intents.all()
+intents: Intents = Intents.all()
 client = Planet(intents=intents, debug_guilds=DEBUG_GUILDS)
 
 
@@ -92,28 +89,6 @@ async def clear(ctx: ApplicationContext, amount: int):
     await ctx.respond(
         get_server_translation(ctx.guild, "msg_clear", amount=amount, channel=ctx.channel.name),
         delete_after=10.0)
-
-
-@client.slash_command(name="poll", description="Create a poll")
-@option(name="title", description="Title of the pole")
-@option(name="option1", description="First option", required=True)
-@option(name="option2", description="Second option", required=True)
-@option(name="duration", description="Poll duration (in seconds)", default=DEFAULT_POLL_DURATION, required=False)
-@option(name="option3", description="Third option", required=False)
-@option(name="option4", description="Fourth option", required=False)
-@default_permissions(manage_guild=True)
-async def poll(ctx: ApplicationContext, title, option1, option2,
-               duration: int, option3=None, option4=None):
-    options = {"A": option1, "B": option2}
-    if option3 is not None: options["C"] = option3
-    if option4 is not None: options["D"] = option4
-    pv = PollView(options)
-    embed = Embed(title=title, colour=ctx.user.colour)
-    embed.set_author(name=get_server_translation(ctx.guild, 'poll_started', author=ctx.user.name),
-                     icon_url=get_icon_url(ctx.user))
-    msg = await ctx.respond(embed=embed, view=pv)
-    data = PollDataClass(title, pv.general_group, options, msg, duration, ctx.user)
-    data.start(client)
 
 
 @client.slash_command(name="manage", description="Manage Planet's server settings")
@@ -178,7 +153,7 @@ async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True, so
         except AttributeError:
             await ctx.respond(get_server_translation(ctx.guild, "join_vc"), delete_after=10.0)
             return
-        except discord.ClientException:
+        except ClientException:
             await ctx.respond(get_server_translation(ctx.guild, "unable2join"), delete_after=10.0)
             return
 
@@ -251,56 +226,6 @@ async def report(ctx: ApplicationContext, message: Message):
     await (await ctx.guild.fetch_channel(channel)).send(get_server_translation(ctx.guild, 'report_submitted'),
                                                         view=view, embed=embed)
     await ctx.respond(get_server_translation(ctx.guild, 'msg_reported'), delete_after=5.0)
-
-
-@client.slash_command(name="upload_sound")
-@option(name="sound_name", description="The name of the sound")
-@option(name="sound_file", description="The sound file")
-async def upload_sound(ctx: ApplicationContext, sound_name: str, sound: discord.Attachment):
-    if sound is None:
-        ctx.respond("Please attach a file!", delete_after=10.0)
-        return
-    if sound.size > 1_000_000:
-        ctx.respond("File is too big, max size is 1 MB!", delete_after=10.0)
-        return
-    if not sound.content_type.startswith("audio"):
-        ctx.respond("File must be a sound (audio file)!", delete_after=10.0)
-        return
-    path = servers.upload_server_sound(ctx.guild, sound_name)
-    await sound.save(path)
-    await ctx.respond(f"Saved sound as **{sound_name}**")
-
-
-@client.slash_command(name="sound")
-@option(name="sound_name", description="The name of the sound")
-async def sound(ctx: ApplicationContext, sound_name: str):
-    if not ctx.guild:
-        return
-
-    try:
-        player: VoiceClient = await ctx.author.voice.channel.connect()
-    except AttributeError:
-        await ctx.respond(get_server_translation(ctx.guild, "join_vc"), delete_after=10.0)
-        return
-    except discord.ClientException:
-        await ctx.respond(get_server_translation(ctx.guild, "unable2join"), delete_after=10.0)
-        return
-
-    path = servers.get_sound(ctx.guild, sound_name)
-    source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(path))
-    player.play(source, after=lambda e: ctx.respond(f"Player error: {e}") if e else None)
-
-    await ctx.respond(f"Playing {sound_name}", delete_after=10.0)
-
-    while player.is_playing(): pass
-
-    await player.disconnect()
-
-
-@client.slash_command(name="list_sounds")
-async def list_sounds(ctx: ApplicationContext):
-    sounds = servers.list_sounds(ctx.guild).keys()
-    await ctx.respond("\n".join(map(lambda x: f' - {x}', sounds)))
 
 
 @client.slash_command(name="queue")

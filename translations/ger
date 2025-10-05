@@ -17,10 +17,6 @@ skipped_songs;**$amount** song(s) übersprungen\
 done;Fertig\
 only_playback;Diese Aktion ist nur während der Wiedergabe erlaubt\
 set_servers_lang;Server sprache zu **$lang** gesetzt\
-poll_started;$author hat eine Umfrage gestartet\
-poll_ended;$authors Umfrage ist zuende\
-total_votes;insgesamte Stimmen\
-votes;Stimmen\
 reset_filters;Filter zurueckgesetzt. Das koennte ein bisschen dauern\
 open_filter_menu;Filter Menue oeffnen\
 close;Schliessen\

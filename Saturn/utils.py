@@ -17,7 +17,7 @@ ICON_URLS = {
 }
 
 
-def get_member_from_user(guild_: Guild, user_: User) -> Member:
+def get_member_from_user(guild_: Guild, user_: User) -> Member | None:
     """
     Gets a member object of a guild from a user
     :param guild_:
@@ -66,7 +66,7 @@ def random_id(length: int = 10) -> str:
     return "".join(random.choice(string.ascii_letters + string.digits) for i in range(length))
 
 
-def get_user(user_id: int, guild: Guild) -> User:
+def get_user(user_id: int, guild: Guild) -> Member | None:
     """
     Get a user their ID and guild
     :param user_id:
@@ -74,7 +74,7 @@ def get_user(user_id: int, guild: Guild) -> User:
     :param guild:
     The guild the user and the bot are in
     :return:
-    The user
+    The user as a member
     """
     return get(guild.members, id=user_id)
 
@@ -116,33 +116,6 @@ class TemplateDataClass:
 
 
 @dataclass
-class PollDataClass(TemplateDataClass):
-    title: str
-    general_group: dict[str, set[int]]
-    options: dict[str, str]
-    original_message: Message
-    duration: int
-    author: User
-
-    @staticmethod
-    def get_winner(self):
-        return {k: v for k, v in sorted([(v[0], len(v[1])) for v in self.general_group.items()], key=lambda item: item[1], reverse=True)}
-
-    async def _execute(self):
-        await asyncio.sleep(self.duration)
-        embed = Embed(title=self.title, colour=self.author.colour)
-        embed.set_author(name=get_server_translation(self.original_message.guild, 'poll_ended', author=self.author.name), icon_url=get_icon_url(self.author))
-        total_votes = sum(v for _, v in self.get_winner(self).items())
-        for i, (n, v) in enumerate(self.get_winner(self).items()):
-            n = self.options[n]
-            if i == 0: n = f'__{n}__'
-            embed.add_field(name=f"{i + 1}. {n}", value=f'{v} {get_server_translation(self.original_message.guild, "votes")}')
-        embed.title += f" [{total_votes} {get_server_translation(self.original_message.guild, 'total_votes')}]"
-        await self.original_message.channel.send(embed=embed)
-        await self.original_message.delete_original_response()
-
-
-@dataclass
 class VoteKickDataClass(TemplateDataClass):
     author: User
     user: Member
@@ -151,12 +124,17 @@ class VoteKickDataClass(TemplateDataClass):
     duration: int
     original_message: Message
 
+    def get_winner(self):
+        return {k: v for k, v in
+                sorted([(v[0], len(v[1])) for v in self.general_group.items()], key=lambda item: item[1], reverse=True)}
+
     async def _execute(self):
         await asyncio.sleep(self.duration)
         embed = Embed(title=get_server_translation(self.user.guild, "vote_kick_a", user=self.user.name), colour=self.author.colour)
         embed.set_author(name=get_server_translation(self.user.guild, "vote_kick_b", author=self.author.name, user=self.user.name), icon_url=get_icon_url(self.user))
-        total_votes = sum(v for _, v in PollDataClass.get_winner(self).items())
-        for i, (n, v) in enumerate(PollDataClass.get_winner(self).items()):
+        gw_items = self.get_winner().items()
+        total_votes = sum(v for _, v in gw_items)
+        for i, (n, v) in enumerate(gw_items):
             if i == 0: verdict, m = n == "A", v
             n = self.options[n]
             if i == 0: n = f'__{n}__'
