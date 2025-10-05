@@ -98,7 +98,7 @@ async def clear(ctx: ApplicationContext, amount: int):
 @default_permissions(manage_guild=True)
 async def manage(ctx: ApplicationContext):
     servers.init_and_get(ctx.guild)
-    await ctx.respond("", view=SettingView())
+    await ctx.respond("", view=SettingView(ctx.guild))
 
 
 @client.slash_command(name="pause", description=get_static_translation("english", "desc_pause"), description_localizations={"en-US": get_static_translation("english", "desc_pause"), "de": get_static_translation("german", "desc_pause")})

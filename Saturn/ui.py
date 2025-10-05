@@ -162,14 +162,14 @@ def _lang_opt(name: str, guid):
 
 
 class LanguagesSelection(Select):
-    def __init__(self_, guid):
-        self_._options = [
+    def __init__(self, guid):
+        self._options = [
             _lang_opt("English", guid),
             _lang_opt("German", guid),
             _lang_opt("Back", guid)
         ]
-        super().__init__(ComponentType.string_select, placeholder="Select one language", custom_id="lang",
-                         options=self_._options)
+        super().__init__(ComponentType.select, placeholder=get_server_translation(guid, "plc_lang"), custom_id="lang",
+                         options=self._options)
 
     async def callback(self, interaction: Interaction):
         lang = self.values[0]
@@ -184,20 +184,20 @@ class LanguagesSelection(Select):
 
 
 class ServerManagementSelection(Select):
-    def __init__(self):
+    def __init__(self, guild: Guild):
         self._options = [
-            SelectOption(label="Language", value="lang", emoji="🌐",
-                         description="The Language that Planet will use for this server"),
-            SelectOption(label="Report Channel", value="report_channel",
-            emoji="❗", description="Send the channel where reports should be sent in (should be a mod only channel)")
+            SelectOption(label=get_server_translation(guild, "opt_lang"), value="lang", emoji="🌐",
+                         description=get_server_translation(guild, "opt_lang_desc")),
+            SelectOption(label=get_server_translation(guild, "opt_report_channel"), value="report_channel",
+            emoji="❗", description=get_server_translation(guild, "opt_report_channel_desc"))
         ]
         self._opts2funcs = {
             "lang": LanguagesSettingView,
             "report_channel": SelectReportChannelView,
             "user_channel": SelectUserChannelView
         }
-        super().__init__(ComponentType.string_select,
-                         placeholder="Select one option", custom_id="sms", options=self._options)
+        super().__init__(ComponentType.select,
+                         placeholder=get_server_translation(guild, "plc_manage"), custom_id="sms", options=self._options)
 
     async def callback(self, interaction: Interaction):
         await interaction.response.send_message(view=self._opts2funcs[self.values[0]](interaction.guild))
@@ -279,7 +279,7 @@ class PollButton(Button):
             else:
                 if uid in g:
                     g.remove(uid)
-        await interaction.response.send_message("You voted!")
+        await interaction.response.send_message(get_server_translation(interaction.guild, "voted"), delete_after=5.0)
 
 
 class PollView(ViewTemplate):
@@ -307,8 +307,8 @@ class SelectFilter(Select):
     def add_opts(self):
         # Descriptions are not necessary
         # Also, I don't know an emoji to perfectly represent pitch
-        self.add_option(emoji="🤏", label="Pitch", value="pitch")
-        self.add_option(emoji="⏩", label="Speed", value="speed")
+        self.add_option(emoji="🤏", label=get_server_translation(self.player.guild, "pitch"), value="pitch")
+        self.add_option(emoji="⏩", label=get_server_translation(self.player.guild, "speed"), value="speed")
 
     async def callback(self, interaction: Interaction):
         await apply_filters(self.player, **{self.values[0]: self.value})
@@ -353,5 +353,5 @@ class ReportMessageView(ViewTemplate):
 SelectReportChannelView = lambda guild: View(SelectChannel(guild))
 SelectUserChannelView = lambda guild: View(SelectChannel(guild, "user_channel_id"))
 SelectFilterView = lambda player, value: View(SelectFilter(player, value))
-SettingView = lambda: View(ServerManagementSelection())
-LanguagesSettingView = lambda guild: View(LanguagesSelection(guild.id))
+SettingView = lambda g: View(ServerManagementSelection(g))
+LanguagesSettingView = lambda guild: View(LanguagesSelection(guild))

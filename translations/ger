@@ -1,71 +1,71 @@
 german\
 now_playing;Jetzt spielt: $title\
 by;von: $by\
-playing_for;Spielt fuer: $duration\
+playing_for;Spielt für: $duration\
 requested_by;Angefordert von: $by\
-msg_clear;Du hast **$amount** Nachrichten aus #$channel geloescht\
+msg_clear;Du hast **$amount** Nachrichten aus #$channel gelöscht\
 current;Aktuell\
-volume_set;Lautstaerke auf **$volume%** gesetzt\
-added_track;**$track** zur Warteschlange hinzugefuegt\
-added_playlist;Playlist $pl_name ($pl_count songs) zur Warteschlange hinzugefuegt\
+volume_set;Lautstärke auf **$volume%** gesetzt\
+added_track;**$track** zur Warteschlange hinzugefügt\
+added_playlist;Playlist $pl_name ($pl_count songs) zur Warteschlange hinzugefügt\
 pause_resume;Wiedergabe pausiert oder fortgesetzt\
 track_not_found;$user - Keine songs mit dieser Suchanfrage gefunden\
 play_outside_home;I kann nur in $channel spielen, weil die Wiedergabe dort gestartet wurde\
-join_vc;Bitte trete zuerst einem VoiceChannel bei\
-unable2join;Ich konnte diesem VoiceChannel nicht beitreten (du kannst es noch mal versuchen, aber das bringt wahrscheinlich nichts)\
+join_vc;Bitte trete zuerst einem Sprachkanal bei\
+unable2join;Ich konnte diesem Sprachkanal nicht beitreten (du kannst es noch mal versuchen, aber das bringt wahrscheinlich nichts)\
 skipped_songs;**$amount** song(s) übersprungen\
 done;Fertig\
 only_playback;Diese Aktion ist nur während der Wiedergabe erlaubt\
 set_servers_lang;Server sprache zu **$lang** gesetzt\
-reset_filters;Filter zurueckgesetzt. Das koennte ein bisschen dauern\
-open_filter_menu;Filter Menue oeffnen\
-close;Schliessen\
-reset;Zuruecksetzen\
-applied_filter;Filter angewendet (**$name**). Das koennte ein bisschen dauern\
+reset_filters;Filter zurückgesetzt. Das könnte ein bisschen dauern\
+open_filter_menu;Filter Menü öffnen\
+close;Schließen\
+reset;Zurücksetzen\
+applied_filter;Filter angewendet (**$name**). Das könnte ein bisschen dauern\
 stop;Stopp\
 playback_stopped;Wiedergabe gestoppt\
 enable_autoplay;Autoplay einschalten\
 disable_autoplay;Autoplay ausschalten\
 play;Fortsetzen\
 pause;Pausieren\
-skip;Ueberspringen\
+skip;Überspringen\
 none;Nichts\
-pitch;Tonhoehe\
+pitch;Tonhöhe\
 speed;Geschwindigkeit\
-msg_deleted;Nachricht geloescht\
+msg_deleted;Nachricht gelöscht\
 filters_view_message_text;Forgefertigte Filter:
-- Nightcore (Tonhoehe 1.2 & Geschwindigkeit 1.2)
+- Nightcore (Tonhöhe 1.2 & Geschwindigkeit 1.2)
 - Slowed    (Geschwindigkeit 0.8)
 - Sped up   (Geschwindigkeit 1.4)
 - Zurzeit angewandt: {cur_applied_filters}\
 vote_kick_a;Soll $user vom Server gekickt werden?\
-vote_kick_b;$authors vote kick gegen $user\
-vote_kick_c;$author hat einen vote kick gegen $user gestartet\
+vote_kick_b;$authors Vote-Kick gegen $user\
+vote_kick_c;$author hat einen Vote-Kick gegen $user gestartet\
 verdict_a;Das Volk hat gesprochen und ist zu dem Urteil gekommen \
 verdict_n;$user NICHT zu kicken.\
 verdict_y;$user zu kicken. Die Entscheidung des Volkes wird bald durchgesetzt.\
 verdict;Urteil\
-verdict_reason;$authors vote kick [$m haben zugestimmt]\
+verdict_reason;$authors Vote-Kick [$m haben zugestimmt]\
 yes;Ja\
 no;Nein\
 msg_reported;Nachricht gemeldet\
 report_submitted;Meldung eingereicht\
 report_case;Meldungs Fall #$case\
-reports_disabled;Meldungen werden auf diesen Server nicht unterstuetzt. Kontaktiere einen Administrator!\
+reports_disabled;Meldungen werden auf diesen Server nicht unterstützt. Kontaktiere einen Administrator!\
 kick;Kick\
 ban;Ban\
 find;Finden\
 close_case;Fall schliessen\
-msg_delete;Nachricht loeschen\
+msg_delete;Nachricht löschen\
 ban_reported_user;Gemeldeten Nutzer gebannt (Fall #$case)\
 kick_reported_user;Gemeldeten Nutzer gekickt (Fall #$case)\
 closed_case;Fall geschlossen: #$case\
 found_case;Gemeldete Nachricht aus Fall #$case\
-deleted_msg;Nachricht geloescht (case #$case)\
+deleted_msg;Nachricht gelöscht (case #$case)\
 reported_msg;Nachricht gemeldet (case #$case)\
 ban_reason;Gebannt von $user, wegen Fall #$case\
 kick_reason;Gekickt von $user, wegen Fall #$case\
-skipped_song;Song uebersprungen\
+skipped_song;Song übersprungen\
 desc_queue;Zeigt die Songs in der Warteschlange\
 name_report;Melden\
 name_votekick;Abstimmung zum Rauswurf\
@@ -88,4 +88,13 @@ desc_opt_add_buttons;Ob Wiedergabesteuerungs-Buttons hinzugefügt werden sollen\
 name_opt_source;quelle\
 desc_opt_source;Audioquelle (entweder YouTube oder Spotify)\
 name_opt_value;wert\
-desc_opt_value;Der Wert, der für den Filter gesetzt werden soll
+desc_opt_value;Der Wert, der für den Filter gesetzt werden soll\
+speed;Geschwindigkeit\
+pitch;Pitch\
+voted;Du hast abgestimmt!\
+plc_manage;Wähle eine Option aus\
+opt_lang;Sprache\
+opt_lang_desc;Die Sprache die Planet auf diesem Server verwendet\
+opt_report_channel;Kanal für Meldungen\
+opt_report_channel_desc;Der Kanal in den Meldungen zur Bearbeitung gesendet werden (sollte ein Moderatoren Kanal sein)\
+plc_lang;Wähle eine Sprache aus

@@ -88,4 +88,13 @@ desc_opt_add_buttons;Whether to add playback management buttons\
 name_opt_source;source\
 desc_opt_source;Audio source (either youtube or spotify)\
 name_opt_value;value\
-desc_opt_value;The value to set for the filter
+desc_opt_value;The value to set for the filter\
+speed;Speed\
+pitch;Pitch\
+voted;You voted!\
+plc_manage;Select an option\
+opt_lang;Language\
+opt_lang_desc;The language Planet uses on this server\
+opt_report_channel;Report Channel\
+opt_report_channel_desc;The channel reports are sent in for review (should be a mod channel)\
+plc_lang;Select a language
