@@ -27,7 +27,7 @@ class Translation:
         self.load()
 
     def load(self) -> None:
-        with open(self.filepath, 'r') as file:
+        with open(self.filepath, 'r', encoding="utf-8") as file:
             for i, c in enumerate(file.read().split("\\")):
                 if i == 0:
                     self.lang = c.lower()
