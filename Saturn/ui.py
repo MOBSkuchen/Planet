@@ -200,7 +200,7 @@ class ServerManagementSelection(Select):
                          placeholder=get_server_translation(guild, "plc_manage"), custom_id="sms", options=self._options)
 
     async def callback(self, interaction: Interaction):
-        await interaction.response.send_message(view=self._opts2funcs[self.values[0]](interaction.guild))
+        await interaction.response.send_message(view=self._opts2funcs[self.values[0]](interaction.guild), delete_after=30.0)
         await self.view.message.delete()
 
 
@@ -260,7 +260,7 @@ class OpenFilterView(Button):
 
     async def callback(self, interaction: Interaction):
         fv = FiltersView(self.player)
-        org_msg: Interaction = await interaction.response.send_message(serve_filters_view_message(self.player), view=fv)
+        org_msg: Interaction = await interaction.response.send_message(serve_filters_view_message(self.player), view=fv, delete_after=30.0)
         self.player.filters_view_message = (await org_msg.original_response())
 
 

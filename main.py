@@ -77,7 +77,7 @@ async def on_member_join(member_: Member):
     b = servers.add_and_init(member_.guild)
     c = b.from_member(member_)
     if (_id := servers.get_server_setting(member_.guild, "user_channel_id")) != -1:
-        await (await member_.guild.fetch_channel(int(_id))).send(f"Hi {member_.display_name}!")
+        await (await member_.guild.fetch_channel(int(_id))).send(f"Hi {member_.display_name}!", delete_after=5.0 * 60)
     return c
 
 
@@ -226,7 +226,7 @@ async def vote_kick(ctx: ApplicationContext, member: Member):
     embed.set_author(name=get_server_translation(ctx.guild, "vote_kick_c", user=member.name, author=ctx.user),
                      icon_url=get_icon_url(member))
     pv = PollView(opt := {"A": get_server_translation(ctx.guild, "yes"), "B": get_server_translation(ctx.guild, "no")})
-    org_message = await ctx.respond(embed=embed, view=pv)
+    org_message = await ctx.respond(embed=embed, view=pv, delete_after=float(DEFAULT_POLL_DURATION+1))
     votekick = VoteKickDataClass(ctx.user, member, pv.general_group, opt, DEFAULT_POLL_DURATION, org_message)
     votekick.start(client)
 
@@ -259,7 +259,7 @@ async def queue(ctx: ApplicationContext):
         return
 
     if len(player.queue) == 0:
-        await ctx.respond("Empty")
+        await ctx.respond("Empty", delete_after=5.0)
         return
     await ctx.respond("\n".join(map(lambda x: f'**{x.title}** - *{x.author}* ({time_format(x.length)})', player.queue)), delete_after=30.0)
 
