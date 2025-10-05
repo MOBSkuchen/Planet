@@ -1,5 +1,5 @@
 from main import launch
-from Saturn import SPOTIFY_ENABLED, SPOTIFY
+from Saturn import SPOTIFY_ENABLED, SPOTIFY, DISABLE_PLAYBACK
 import multiprocessing as mp
 import subprocess as sbp
 import sys
@@ -41,23 +41,25 @@ def main():
         lavalink_proc = mp.Process(target=start_lavalink, args=[DISABLE_LAVALINK_OUTPUT])
         launch_proc = mp.Process(target=launch)
         print("Processes ready!")
-        if OVERWRITE_LAVALINK_APP_YML:
+        if (not DISABLE_PLAYBACK) and OVERWRITE_LAVALINK_APP_YML:
             overwrite_lavalink()
-        lavalink_proc.start()
-        print("Lavalink started...", "[ENABLED OUTPUT]" if not DISABLE_LAVALINK_OUTPUT else "[DISABLED OUTPUT]", "[OVERWROTE LAVALINK application.yml]" if OVERWRITE_LAVALINK_APP_YML else "")
+        if not DISABLE_PLAYBACK:
+            lavalink_proc.start()
+            print("Lavalink started...", "[ENABLED OUTPUT]" if not DISABLE_LAVALINK_OUTPUT else "[DISABLED OUTPUT]", "[OVERWROTE LAVALINK application.yml]" if OVERWRITE_LAVALINK_APP_YML else "")
         launch_proc.start()
         print("Launched Planet")
         print("===============")
         while True: pass
     except KeyboardInterrupt:
         print("Shutting down...")
-        print("Terminating Lavalink")
-        lavalink_proc.terminate()
-        print("Done")
+        if not DISABLE_PLAYBACK:
+            print("Terminating Lavalink")
+            lavalink_proc.terminate()
+            print("Done")
         print("Terminating Planet")
         launch_proc.terminate()
         print("Done")
-        if OVERWRITE_LAVALINK_APP_YML and LAVALINK_FILE_CONTENT is not None:
+        if (not DISABLE_PLAYBACK) and OVERWRITE_LAVALINK_APP_YML and LAVALINK_FILE_CONTENT is not None:
             print("Reverting application.yml")
             revert_lavalink()
             print("Done")

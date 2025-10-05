@@ -1,5 +1,14 @@
 # Planet - All purpose discord bot
 Welcome to the all-purpose Discord bot built with Python using [pycord](https://github.com/Pycord-Development/pycord)! This versatile bot is designed to enhance your Discord server experience by providing a range of functionalities and features. It is useful for server moderators, admins and all other members.
+## Installation
+1. Install Python (>= 1.11)
+2. Install Java to use Playback features
+3. Clone this Repo
+4. Install dependencies (" pip install -r requirements.txt ")
+   - Uninstall py-cord and discord.py and then install py-cord again. (See requirements.txt)
+5. Create a config
+6. Run launch.py
+
 ## Features
 - Music
   - Play YouTube Videos
