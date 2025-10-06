@@ -26,8 +26,8 @@ stop;Stop\
 playback_stopped;Playback stopped\
 enable_autoplay;Enable Autoplay\
 disable_autoplay;Disable Autoplay\
-play;Play\
-pause;Pause\
+play;Fortsetzen\
+pause;Pausieren\
 skip;Skip\
 none;None\
 pitch;Pitch\
