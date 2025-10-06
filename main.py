@@ -1,5 +1,4 @@
-from discord import Message, Member, Intents, ApplicationContext, default_permissions, Embed, ClientException, Option, \
-    MISSING
+from discord import Message, Member, Intents, ApplicationContext, default_permissions, Embed, ClientException, Option
 from discord.ext import bridge
 from typing import cast
 import warnings
@@ -113,7 +112,7 @@ def option(name, input_type=None, **kwargs):
 @default_permissions(manage_messages=True)
 async def clear(ctx: ApplicationContext, amount: int, author: Member=None, contains: str=None):
     if (author is None) and (contains is None):
-        check = MISSING
+        check = lambda msg: True
     else:
         if author is None:
             check = lambda msg: contains in msg.content
@@ -121,8 +120,10 @@ async def clear(ctx: ApplicationContext, amount: int, author: Member=None, conta
             check = lambda msg: msg.author.id == author.id
         else:
             check = lambda msg: (contains in msg.content) and (msg.author.id == author.id)
-    await ctx.defer()
     await ctx.channel.purge(limit=amount, check=check)
+    await ctx.respond(
+        get_server_translation(ctx.guild, "msg_clear", amount=amount, channel=ctx.channel.name),
+        delete_after=10.0)
 
 @client.slash_command(name="manage", description=get_static_translation("english", "desc_manage"), description_localizations={"en-US": get_static_translation("english", "desc_manage"), "de": get_static_translation("german", "desc_manage")})
 @default_permissions(manage_guild=True)
