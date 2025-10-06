@@ -74,7 +74,7 @@ desc_play;Spiele einen Song\
 desc_clear;Lösche eine oder mehrere Nachrichten aus dem Kanal\
 desc_volume;Ändere die Lautstärke (0-500)\
 desc_skip;Überspringe einen oder mehrere Songs\
-desc_pause;Pausiert oder fortsesetzt die Wiedergabe\
+desc_pause;Pausiert oder setzt die Wiedergabe fort\
 desc_manage;Verwalte die Planet-Einstellungen für diesen Server\
 start_vote_kick;Starte eine Abstimmung zum Rauswurf\
 name_opt_amount;anzahl\
