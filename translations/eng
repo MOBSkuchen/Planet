@@ -108,4 +108,6 @@ hours;$hours hours\
 minutes;$minutes minutes\
 seconds;$seconds seconds\
 and;and\
-desc_stop;Stops playback and leaves the Voice Channel
+desc_stop;Stops playback and leaves the Voice Channel\
+paused;Playback paused\
+resumed;Playback resumed

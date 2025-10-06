@@ -8,7 +8,6 @@ current;Aktuell\
 volume_set;Lautstärke auf **$volume%** gesetzt\
 added_track;**$track** zur Warteschlange hinzugefügt\
 added_playlist;Playlist $pl_name ($pl_count songs) zur Warteschlange hinzugefügt\
-pause_resume;Wiedergabe pausiert oder fortgesetzt\
 track_not_found;$user - Keine songs mit dieser Suchanfrage gefunden\
 play_outside_home;I kann nur in $channel spielen, weil die Wiedergabe dort gestartet wurde\
 join_vc;Bitte trete zuerst einem Sprachkanal bei\
@@ -108,4 +107,6 @@ hours;$hours Stunden\
 minutes;$minutes Minuten\
 seconds;$seconds Sekunden\
 and;und\
-desc_stop;Stoppt die Wiedergabe und verlässt den Sprachkanal
+desc_stop;Stoppt die Wiedergabe und verlässt den Sprachkanal\
+paused;Wiedergabe pausiert\
+resumed;Wiedergabe fortgesetzt

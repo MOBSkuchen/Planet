@@ -5,7 +5,6 @@ import warnings
 import yaml
 import wavelink
 from wavelink import AutoPlayMode
-
 from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
     get_embed, AudioPlayerView, SelectFilterView, get_icon_url, multi_source_search, \
     ReportMessageView, VoteKickDataClass, time_format, PollView, get_static_translation
@@ -144,8 +143,7 @@ async def pause(ctx: ApplicationContext):
         await ctx.respond(get_server_translation(ctx.guild, "only_playback"))
         return
     await player.pause(not player.paused)
-    # TODO: Change from done to paused / resumed
-    await ctx.respond(get_server_translation(ctx.guild, "done"), delete_after=0.1)
+    await ctx.respond(get_server_translation(ctx.guild, "paused" if player.paused else "resumed"), delete_after=0.1)
 
 
 @client.slash_command(name="stop", description=get_static_translation("english", "desc_stop"), description_localizations={"en-US": get_static_translation("english", "desc_stop"), "de": get_static_translation("german", "desc_stop")})
