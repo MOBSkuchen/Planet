@@ -274,7 +274,7 @@ async def queue(ctx: ApplicationContext):
     if len(player.queue) == 0:
         await ctx.respond("Empty", delete_after=5.0)
         return
-    await ctx.respond("\n".join(map(lambda x: f'**{x.title}** - *{x.author}* ({time_format(x.length)})', player.queue)), delete_after=30.0)
+    await ctx.respond("\n".join(map(lambda x: f'**{x.title}** - *{x.author}* ({time_format(x.length, ctx.guild)})', player.queue)), delete_after=30.0)
 
 
 def launch():

@@ -101,4 +101,8 @@ opt_lang;Language\
 opt_lang_desc;The language Planet uses on this server\
 opt_report_channel;Report Channel\
 opt_report_channel_desc;The channel reports are sent in for review (should be a mod channel)\
-plc_lang;Select a language
+plc_lang;Select a language\
+hours;$hours hours\
+minutes;$minutes minutes\
+seconds;$seconds seconds\
+and;and

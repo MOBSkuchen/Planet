@@ -101,4 +101,8 @@ opt_lang;Sprache\
 opt_lang_desc;Die Sprache die Planet auf diesem Server verwendet\
 opt_report_channel;Kanal für Meldungen\
 opt_report_channel_desc;Der Kanal in den Meldungen zur Bearbeitung gesendet werden (sollte ein Moderatoren Kanal sein)\
-plc_lang;Wähle eine Sprache aus
+plc_lang;Wähle eine Sprache aus\
+hours;$hours Stunden\
+minutes;$minutes Minuten\
+seconds;$seconds Sekunden\
+and;and

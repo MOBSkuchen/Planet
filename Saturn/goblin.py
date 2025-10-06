@@ -78,7 +78,7 @@ def get_embed(player: wavelink.Player, track: wavelink.Playable, recommended: bo
 
     embed = Embed(color=get_color(thumbnail))
     embed.add_field(name=f"{get_server_translation(guild, 'now_playing', title=title)}",
-                    value=f"{get_server_translation(guild, 'by', by=author)}\n{get_server_translation(guild, 'playing_for', duration=time_format(milliseconds))}",
+                    value=f"{get_server_translation(guild, 'by', by=author)}\n{get_server_translation(guild, 'playing_for', duration=time_format(milliseconds, player.guild))}",
                     inline=False)
     if track.album.name is not None:
         embed.add_field(name="Album", value=track.album.name)

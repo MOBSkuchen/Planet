@@ -30,12 +30,14 @@ def get_member_from_user(guild_: Guild, user_: User) -> Member | None:
     return guild_.get_member(user_.id)
 
 
-def time_format(milliseconds: int) -> str:
+def time_format(milliseconds: int, guild: Guild) -> str:
     """
     Get time from milliseconds in the format of
     <hours> hours, <minutes> minutes and <seconds>
     :param milliseconds:
     Time in milliseconds
+    :param guild:
+    Guild to be used in (for translation)
     :return:
     Formatted time
     """
@@ -44,14 +46,15 @@ def time_format(milliseconds: int) -> str:
     hours = int((milliseconds / (1000 * 60 * 60)) % 24)
     ret = ""
     if hours != 0:
-        ret += f"{hours} hours"
+        ret += get_server_translation(guild, "hours", hours=hours)
         if minutes != 0:
             ret += ", "
     if minutes != 0:
-        ret += f"{minutes} minutes"
+        ret += get_server_translation(guild, "minutes", minutes=minutes)
         if seconds != 0:
-            ret += " and "
-    ret += f"{seconds} seconds"
+            ret += f" {get_server_translation(guild, "and")} "
+    if seconds != 0:
+        ret += get_server_translation(guild, "seconds", seconds=seconds)
     return ret
 
 
