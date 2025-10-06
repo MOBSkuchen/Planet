@@ -107,4 +107,5 @@ plc_lang;Select a language\
 hours;$hours hours\
 minutes;$minutes minutes\
 seconds;$seconds seconds\
-and;and
+and;and\
+desc_stop;Stops playback and leaves the Voice Channel

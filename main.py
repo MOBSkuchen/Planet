@@ -144,7 +144,19 @@ async def pause(ctx: ApplicationContext):
         await ctx.respond(get_server_translation(ctx.guild, "only_playback"))
         return
     await player.pause(not player.paused)
+    # TODO: Change from done to paused / resumed
     await ctx.respond(get_server_translation(ctx.guild, "done"), delete_after=0.1)
+
+
+@client.slash_command(name="stop", description=get_static_translation("english", "desc_stop"), description_localizations={"en-US": get_static_translation("english", "desc_stop"), "de": get_static_translation("german", "desc_stop")})
+@default_permissions(mute_members=True)
+async def pause(ctx: ApplicationContext):
+    player = client.get_player(ctx)
+    if player is None:
+        await ctx.respond(get_server_translation(ctx.guild, "only_playback"))
+        return
+    await player.disconnect()
+    await ctx.respond(get_server_translation(ctx.guild, "playback_stopped"), delete_after=0.1)
 
 
 @client.slash_command(name="skip", description=get_static_translation("english", "desc_skip"), description_localizations={"en-US": get_static_translation("english", "desc_skip"), "de": get_static_translation("german", "desc_skip")})

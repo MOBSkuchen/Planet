@@ -107,4 +107,5 @@ plc_lang;Wähle eine Sprache aus\
 hours;$hours Stunden\
 minutes;$minutes Minuten\
 seconds;$seconds Sekunden\
-and;und
+and;und\
+desc_stop;Stoppt die Wiedergabe und verlässt den Sprachkanal
