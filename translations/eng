@@ -89,6 +89,10 @@ name_opt_source;source\
 desc_opt_source;Audio source (either youtube or spotify)\
 name_opt_value;value\
 desc_opt_value;The value to set for the filter\
+name_opt_author;author\
+desc_opt_author;The author whose messages should be deleted\
+name_opt_contains;contains\
+desc_opt_contains;The string of characters that should be targeted\
 speed;Speed\
 pitch;Pitch\
 voted;You voted!\

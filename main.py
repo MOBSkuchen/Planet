@@ -1,4 +1,5 @@
-from discord import Message, Member, Intents, ApplicationContext, default_permissions, Embed, ClientException, Option
+from discord import Message, Member, Intents, ApplicationContext, default_permissions, Embed, ClientException, Option, \
+    MISSING
 from discord.ext import bridge
 from typing import cast
 import warnings
@@ -106,14 +107,22 @@ def option(name, input_type=None, **kwargs):
 
 
 @client.slash_command(name="clear", description=get_static_translation("english", "desc_clear"), description_localizations={"en-US": get_static_translation("english", "desc_clear"), "de": get_static_translation("german", "desc_clear")})
-@option("amount", min_value=1, max_value=100, required=True)
+@option("amount", input_type=int, min_value=1, max_value=100, required=True)
+@option("author", input_type=Member, required=False)
+@option("contains", input_type=str, required=False)
 @default_permissions(manage_messages=True)
-async def clear(ctx: ApplicationContext, amount: int):
-    await ctx.channel.purge(limit=amount)
-    await ctx.respond(
-        get_server_translation(ctx.guild, "msg_clear", amount=amount, channel=ctx.channel.name),
-        delete_after=10.0)
-
+async def clear(ctx: ApplicationContext, amount: int, author: Member=None, contains: str=None):
+    if (author is None) and (contains is None):
+        check = MISSING
+    else:
+        if author is None:
+            check = lambda msg: contains in msg.content
+        elif contains is None:
+            check = lambda msg: msg.author.id == author.id
+        else:
+            check = lambda msg: (contains in msg.content) and (msg.author.id == author.id)
+    await ctx.defer()
+    await ctx.channel.purge(limit=amount, check=check)
 
 @client.slash_command(name="manage", description=get_static_translation("english", "desc_manage"), description_localizations={"en-US": get_static_translation("english", "desc_manage"), "de": get_static_translation("german", "desc_manage")})
 @default_permissions(manage_guild=True)

@@ -89,6 +89,10 @@ name_opt_source;quelle\
 desc_opt_source;Audioquelle (entweder YouTube oder Spotify)\
 name_opt_value;wert\
 desc_opt_value;Der Wert, der für den Filter gesetzt werden soll\
+name_opt_author;autor\
+desc_opt_author;Der Autor, dessen Nachrichten gelöscht werden\
+name_opt_contains;enthält\
+desc_opt_contains;Den Text der angepeilt wird\
 speed;Geschwindigkeit\
 pitch;Pitch\
 voted;Du hast abgestimmt!\
