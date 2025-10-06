@@ -93,6 +93,8 @@ name_opt_author;author\
 desc_opt_author;The author whose messages should be deleted\
 name_opt_contains;contains\
 desc_opt_contains;The string of characters that should be targeted\
+name_opt_autoplay;autoplay\
+desc_opt_autoplay;Whether following songs should be played automatically\
 speed;Speed\
 pitch;Pitch\
 voted;You voted!\

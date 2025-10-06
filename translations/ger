@@ -93,6 +93,8 @@ name_opt_author;autor\
 desc_opt_author;Der Autor, dessen Nachrichten gelöscht werden\
 name_opt_contains;enthält\
 desc_opt_contains;Den Text der angepeilt wird\
+name_opt_autoplay;autoplay\
+desc_opt_autoplay;Ob nachfolgende Songs automatisch abgespielt werden sollen\
 speed;Geschwindigkeit\
 pitch;Pitch\
 voted;Du hast abgestimmt!\

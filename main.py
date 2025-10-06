@@ -4,6 +4,8 @@ from typing import cast
 import warnings
 import yaml
 import wavelink
+from wavelink import AutoPlayMode
+
 from Saturn import TOKEN, DEBUG_GUILDS, SettingView, servers, Translation, get_server_translation, \
     get_embed, AudioPlayerView, SelectFilterView, get_icon_url, multi_source_search, \
     ReportMessageView, VoteKickDataClass, time_format, PollView, get_static_translation
@@ -54,6 +56,8 @@ class Planet(bridge.Bot):
 
     async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload) -> None:
         if payload.player is not None:
+            if (payload.player.autoplay == AutoPlayMode.disabled) and (payload.player.queue.count == 0):
+                await payload.player.disconnect()
             associated_message = getattr(payload.player, "associated_message", None)
             if associated_message is None: return
             await associated_message.delete()
@@ -172,10 +176,11 @@ async def volume(ctx: ApplicationContext, percent: int):
 
 @client.slash_command(name="play", description=get_static_translation("english", "desc_play"), description_localizations={"en-US": get_static_translation("english", "desc_play"), "de": get_static_translation("german", "desc_play")})
 @option("query", required=True)
-@option("add_buttons", default=False, required=False)
+@option("add_buttons", default=True, required=False)
+@option("autoplay", default=True, required=False)
 @option("source", required=False, choices=["youtube", "spotify"])
 @default_permissions(mute_members=True, move_members=True)
-async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True, source: str = ""):
+async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True, autoplay: bool = True, source: str = ""):
     if not ctx.guild:
         return
     track = None
@@ -190,7 +195,7 @@ async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True, so
             await ctx.respond(get_server_translation(ctx.guild, "unable2join"), delete_after=10.0)
             return
 
-    player.autoplay = wavelink.AutoPlayMode.enabled
+    player.autoplay = wavelink.AutoPlayMode.enabled if autoplay else wavelink.AutoPlayMode.disabled
 
     if not hasattr(player, "home"):
         player.home = ctx.channel
