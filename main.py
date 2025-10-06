@@ -1,4 +1,4 @@
-from discord import Message, Member, Intents, ApplicationContext, option, default_permissions, Embed, ClientException
+from discord import Message, Member, Intents, ApplicationContext, default_permissions, Embed, ClientException, Option
 from discord.ext import bridge
 from typing import cast
 import warnings
@@ -24,7 +24,7 @@ DEFAULT_VOLUME = 100
 MAX_VOLUME = 500
 DEFAULT_POLL_DURATION = 40
 
-__version__ = "4.5"
+__version__ = "4.6"
 
 
 class Planet(bridge.Bot):
@@ -81,11 +81,32 @@ async def on_member_join(member_: Member):
     return c
 
 
+def option(name, input_type=None, **kwargs):
+    """
+    A shortcut for: the @option(...) decorator
+    """
+
+    kwargs["description"] = get_static_translation("english", f"desc_opt_{name}")
+    kwargs["name_localizations"] = {"en-US": get_static_translation("english", f"name_opt_{name}"),
+                          "de": get_static_translation("german", f"name_opt_{name}")}
+    kwargs["description_localizations"] = {"en-US": get_static_translation("english", f"desc_opt_{name}"),
+                                 "de": get_static_translation("german", f"desc_opt_{name}")}
+
+    def decorator(func):
+        resolved_name = kwargs.pop("parameter_name", None) or name
+        itype = (
+            kwargs.pop("type", None)
+            or input_type
+            or func.__annotations__.get(resolved_name, str)
+        )
+        func.__annotations__[resolved_name] = Option(itype, name=name, **kwargs)
+        return func
+
+    return decorator
+
+
 @client.slash_command(name="clear", description=get_static_translation("english", "desc_clear"), description_localizations={"en-US": get_static_translation("english", "desc_clear"), "de": get_static_translation("german", "desc_clear")})
-@option("amount", description=get_static_translation("english", "desc_opt_amount"),
-        name_localizations={"en-US": get_static_translation("english", "name_opt_amount"), "de": get_static_translation("german", "name_opt_amount")},
-        description_localizations={"en-US": get_static_translation("english", "desc_opt_amount"), "de": get_static_translation("german", "desc_opt_amount")},
-        min_value=1, max_value=100, required=True)
+@option("amount", min_value=1, max_value=100, required=True)
 @default_permissions(manage_messages=True)
 async def clear(ctx: ApplicationContext, amount: int):
     await ctx.channel.purge(limit=amount)
@@ -113,10 +134,7 @@ async def pause(ctx: ApplicationContext):
 
 
 @client.slash_command(name="skip", description=get_static_translation("english", "desc_skip"), description_localizations={"en-US": get_static_translation("english", "desc_skip"), "de": get_static_translation("german", "desc_skip")})
-@option(name="amount", description=get_static_translation("english", "desc_opt_amount"),
-        name_localizations={"en-US": get_static_translation("english", "name_opt_amount"), "de": get_static_translation("german", "name_opt_amount")},
-        description_localizations={"en-US": get_static_translation("english", "desc_opt_amount"), "de": get_static_translation("german", "desc_opt_amount")},
-        required=False)
+@option(name="amount", required=False)
 @default_permissions(mute_members=True)
 async def skip(ctx: ApplicationContext, amount: int = 1):
     player = client.get_player(ctx)
@@ -130,10 +148,7 @@ async def skip(ctx: ApplicationContext, amount: int = 1):
 
 
 @client.slash_command(name="volume", description=get_static_translation("english", "desc_volume"), description_localizations={"en-US": get_static_translation("english", "desc_volume"), "de": get_static_translation("german", "desc_volume")})
-@option("percent", description=get_static_translation("english", "desc_opt_percent"),
-        name_localizations={"en-US": get_static_translation("english", "name_opt_percent"), "de": get_static_translation("german", "name_opt_percent")},
-        description_localizations={"en-US": get_static_translation("english", "desc_opt_percent"), "de": get_static_translation("german", "desc_opt_percent")},
-        min_value=0, max_value=MAX_VOLUME, required=True)
+@option("percent", min_value=0, max_value=MAX_VOLUME, required=True)
 @default_permissions(mute_members=True)
 async def volume(ctx: ApplicationContext, percent: int):
     player = client.get_player(ctx)
@@ -146,19 +161,9 @@ async def volume(ctx: ApplicationContext, percent: int):
 
 
 @client.slash_command(name="play", description=get_static_translation("english", "desc_play"), description_localizations={"en-US": get_static_translation("english", "desc_play"), "de": get_static_translation("german", "desc_play")})
-@option("query", description=get_static_translation("english", "desc_opt_query"),
-        name_localizations={"en-US": get_static_translation("english", "name_opt_query"), "de": get_static_translation("german", "name_opt_query")},
-        description_localizations={"en-US": get_static_translation("english", "desc_opt_query"), "de": get_static_translation("german", "desc_opt_query")},
-        required=True)
-@option("add_buttons", description=get_static_translation("english", "desc_opt_add_buttons"),
-        name_localizations={"en-US": get_static_translation("english", "name_opt_add_buttons"), "de": get_static_translation("german", "name_opt_add_buttons")},
-        description_localizations={"en-US": get_static_translation("english", "desc_opt_add_buttons"), "de": get_static_translation("german", "desc_opt_add_buttons")},
-        default=False, required=False)
-@option("source", description=get_static_translation("english", "desc_opt_source"),
-        name_localizations={"en-US": get_static_translation("english", "name_opt_source"), "de": get_static_translation("german", "name_opt_source")},
-        description_localizations={"en-US": get_static_translation("english", "desc_opt_source"), "de": get_static_translation("german", "desc_opt_source")},
-        required=False,
-        choices=["youtube", "spotify"])
+@option("query", required=True)
+@option("add_buttons", default=False, required=False)
+@option("source", required=False, choices=["youtube", "spotify"])
 @default_permissions(mute_members=True, move_members=True)
 async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True, source: str = ""):
     if not ctx.guild:
@@ -206,9 +211,7 @@ async def play(ctx: ApplicationContext, query: str, add_buttons: bool = True, so
 
 
 @client.slash_command(name="filter", description=get_static_translation("english", "desc_filter"), description_localizations={"en-US": get_static_translation("english", "desc_filter"), "de": get_static_translation("german", "desc_filter")})
-@option(name="value", description=get_static_translation("english", "desc_opt_value"),
-        name_localizations={"en-US": get_static_translation("english", "name_opt_value"), "de": get_static_translation("german", "name_opt_value")},
-        description_localizations={"en-US": get_static_translation("english", "desc_opt_value"), "de": get_static_translation("german", "desc_opt_value")})
+@option(name="value", input_type=float)
 @default_permissions(mute_members=True)
 async def filter(ctx: ApplicationContext, value: float):
     player = client.get_player(ctx)
